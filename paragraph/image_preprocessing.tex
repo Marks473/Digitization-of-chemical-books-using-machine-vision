@@ -1,26 +1,30 @@
 Большинство архивных химических книг и сканированных материалов характеризуются неоднородным качеством. В работе~\cite{refAkhil} выделялись следующие проблемы качества сканированных книг:
 \begin{itemize}
-	\item Низкое разрешение / размытость (рис.~\ref{fig:poor_quality} а)
-	\item Шум, зернистость, артефакты сжатия (рис.~\ref{fig:poor_quality} б)
-	\item Неравномерная засветлённость / тени (рис.~\ref{fig:poor_quality} в)
-	\item Ориентация страницы с малым поворотом (рис.~\ref{fig:poor_quality} г)
+	\item Низкое разрешение / размытость (рис.~\ref{fig:poor_quality} a)
+	\item Шум, зернистость, артефакты сжатия (рис.~\ref{fig:poor_quality} b)
+	\item Неравномерная засветлённость / тени (рис.~\ref{fig:poor_quality} c)
+	\item Ориентация страницы с малым поворотом (рис.~\ref{fig:poor_quality} d)
 \end{itemize}
 
-\begin{figure}[hbtp]
+\begin{figure*}[hbtp]
 	\centering
 	\begin{tabular}{cc}
-		\includegraphics[width=0.45\linewidth]{img/blur.png} & 
-		\includegraphics[width=0.45\linewidth]{img/grain.png} \\
-		а$)$ & б$)$\\
-		\includegraphics[width=0.45\linewidth]{img/flashing.png} & 
-		\includegraphics[width=0.45\linewidth]{img/orientation.png}\\
-		в$)$ & г$)$		
+		\includegraphics[width=0.25\linewidth]{img/blur.png} & 
+		\includegraphics[width=0.25\linewidth]{img/grain.png} \\
+		a$)$ & b$)$\\
+		\includegraphics[width=0.25\linewidth]{img/flashing.png} & 
+		\includegraphics[width=0.25\linewidth]{img/orientation.png}\\
+		c$)$ & d$)$		
 	\end{tabular}
-	\caption{Пример плохого качества сканированных книг
-		a) Размытость; б) Шум; в) Неравномерная засветлённость; г) Ориентация страницы с малым поворотом.
+	\bicaption
+	{Пример плохого качества сканированных книг
+		a) Размытость; b) Шум; c) Неравномерная засветлённость; d) Ориентация страницы с малым поворотом.
+	}
+	{An example of poor quality scanned books 
+		a) Blur; b) Noise; c) Uneven illumination; d) Page orientation with low rotation.	
 	}
 	\label{fig:poor_quality}
-\end{figure}
+\end{figure*}
 
 Эти факторы напрямую влияют на точность распознания как и графических формул и реакций так и текста. Поэтому перед обработкой самой OCR необходимо сделать пред обработку и нормализацию изображения. 
 
