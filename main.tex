@@ -1,0 +1,30 @@
+\documentclass[11pt, twocolumn]{article}
+
+\input{preamble.tex}
+\input{user_preamble.tex} 
+
+\begin{document}
+	
+\raggedbottom
+\setlength{\parskip}{0pt}
+\twocolumn[{
+	\begin{minipage}{\textwidth}
+		\input{tit.tex}
+		\vspace{2em} % Отступ перед основным текстом
+	\end{minipage}
+}]
+
+\input{chapter/introduction.tex}
+\input{chapter/01chapter.tex}
+\input{chapter/02chapter.tex}
+\input{chapter/03chapter.tex}
+\input{chapter/conclusion.tex}
+
+\input{paragraph/demo.tex}
+
+\begin{thebibliography}{99}
+	\small % Необязательно
+	\input{thebibliography.tex}
+\end{thebibliography}
+	
+\end{document}

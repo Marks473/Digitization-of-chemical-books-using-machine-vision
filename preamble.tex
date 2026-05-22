@@ -1,0 +1,74 @@
+% --- Кодировки и языки ---
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+% --- Страница и колонки ---
+% Поля: верх/низ 2.5 см, лево/право 1.75 см.
+% Колонки: 8.5 см, промежуток 0.5 см (под A4).
+\usepackage[
+a4paper,
+top=2.5cm,bottom=2.5cm,
+left=1.75cm,right=1.75cm,
+columnsep=0.5cm
+]{geometry}
+% --- Шрифт (Times-подобный с кириллицей) ---
+% Если редакция требует строго системный Times New Roman — тогда лучше XeLaTeX + fontspec.
+\usepackage{tempora}
+\usepackage{newtxmath}
+% --- Абзацы/переносы/интервалы ---
+\usepackage{setspace}
+\singlespacing
+\usepackage{microtype}
+\setlength{\parindent}{1cm} % красная строка 1 см
+\setlength{\parskip}{0pt}   % без доп. интервала между абзацами
+\usepackage{indentfirst}     % красная строка в первом абзаце после заголовка
+% Чтобы LaTeX не «раздувал» вертикальные расстояния ради выравнивания низа колонок:
+\raggedbottom
+% --- Формулы: размеры 11/7/5 ---
+\DeclareMathSizes{11}{11}{7}{5}
+% --- Подписи рисунков и таблиц: 10 pt, bold, одинарный ---
+\usepackage[font={small,bf},labelsep=period]{caption}
+\addto\captionsrussian{\renewcommand\figurename{Рис.}}
+\addto\captionsrussian{\renewcommand\tablename{Таблица}}
+% --- Графика ---
+\usepackage{graphicx}
+% --- Ссылки в квадратных скобках [1], порядок по цитированию ---
+\usepackage{cite}
+% --- Удобные макросы для шапки ---
+\newcommand{\udc}[1]{\noindent\textbf{УДК #1}\par\vspace{0.75em}}
+\newcommand{\ruTitle}[1]{\begin{center}\textbf{\Large #1}\end{center}\vspace{0.25em}}
+\newcommand{\enTitle}[1]{\begin{center}\textbf{\Large #1}\end{center}\vspace{0.25em}}
+\newcommand{\ruAuthors}[1]{\begin{center}\textbf{#1}\end{center}\vspace{0.5em}}
+\newcommand{\enAuthors}[1]{\begin{center}\textbf{#1}\end{center}\vspace{0.5em}}
+\newcommand{\ruAbstract}[1]{\noindent\textbf{Резюме.} \textit{#1}\par\vspace{0.5em}}
+\newcommand{\enAbstract}[1]{\noindent\textbf{Abstract.} \textit{#1}\par\vspace{0.5em}}
+\newcommand{\ruKeywords}[1]{\noindent\textbf{Ключевые слова:} #1\par\vspace{0.75em}}
+\newcommand{\enKeywords}[1]{\noindent\textbf{Keywords:} #1\par\vspace{1.25em}}
+
+\usepackage{titlesec}
+
+\usepackage{titlesec}
+
+\usepackage{titlesec}
+
+\titleformat{\section}
+{\bfseries\normalsize}
+{}
+{0pt}
+{}
+
+\titlespacing*{\section}
+{0pt}
+{\baselineskip}
+{0pt}
+
+\titleformat{\subsection}
+{\bfseries\normalsize}
+{}
+{0pt}
+{}
+
+\titlespacing*{\subsection}
+{0pt}
+{0.75\baselineskip}
+{0pt}

@@ -1,0 +1,48 @@
+\section*{Проблематика оцифровки формул}
+Вставка формулы осуществляется с использованием шрифтов, аналогичных Times New Roman. Размеры настроены автоматически:
+\begin{equation}
+	f(x) = \sum_{i=1}^{n} \frac{A_i}{B_{i^2}} + \alpha \beta \gamma
+\end{equation}
+Здесь индексы имеют размер 7 пт, а вложенные -- 5 пт, как того требуют правила ИрГУПС.
+
+\section*{Пример вставки рисунка}
+Рисунки должны быть черно-белыми или в градациях серого, 300 dpi. В журнал не принимаются цветные рисунки.
+Если рисунок узкий, его можно вставить в одну колонку:
+
+\begin{figure}[h]
+	\centering
+	% \includegraphics[width=\linewidth]{image_bw.jpg}
+	\rule{\linewidth}{4cm} % Заглушка для рисунка
+	\caption{Схема конвейера обработки}
+	\label{fig:pipeline}
+\end{figure}
+
+Если рисунок широкий (до 150 мм), используйте окружение \texttt{figure*}, чтобы он растянулся на обе колонки:
+
+\begin{figure*}[t]
+	\centering
+	% \includegraphics[width=150mm, height=100mm, keepaspectratio]{large_scheme_grayscale.tif}
+	\rule{150mm}{5cm} % Заглушка для широкого рисунка
+	\caption{Архитектура системы поиска и верификации (пример широкого рисунка)}
+	\label{fig:architecture}
+\end{figure*}
+
+\section*{Оформление таблиц}
+Подписи к таблицам оформляются шрифтом 10 пт, полужирным:
+
+\begin{table}[h]
+	\centering
+	\caption{Сравнение метрик OCR и OCSR}
+	\begin{tabular}{|p{3cm}|c|c|}
+		\hline
+		Метод & Precision & Recall \\
+		\hline
+		Tesseract & 0.85 & 0.82 \\
+		DECIMER & 0.89 & 0.88 \\
+		Наш конвейер & 0.94 & 0.91 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+\section*{Заключение}
+Выводы по работе. Общий объем статьи должен составлять 9–12 страниц формата А4.
