@@ -2,57 +2,45 @@
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+
 % --- Страница и колонки ---
-% Поля: верх/низ 2.5 см, лево/право 1.75 см.
-% Колонки: 8.5 см, промежуток 0.5 см (под A4).
 \usepackage[
 a4paper,
 top=2.5cm,bottom=2.5cm,
 left=1.75cm,right=1.75cm,
 columnsep=0.5cm
 ]{geometry}
-% --- Шрифт (Times-подобный с кириллицей) ---
-% Если редакция требует строго системный Times New Roman — тогда лучше XeLaTeX + fontspec.
+
+% --- Шрифты ---
 \usepackage{tempora}
 \usepackage{newtxmath}
-% --- Абзацы/переносы/интервалы ---
+
+% --- Абзацы/интервалы ---
 \usepackage{setspace}
 \singlespacing
 \usepackage{microtype}
-\setlength{\parindent}{1cm} % красная строка 1 см
-\setlength{\parskip}{0pt}   % без доп. интервала между абзацами
-\usepackage{indentfirst}     % красная строка в первом абзаце после заголовка
-% Чтобы LaTeX не «раздувал» вертикальные расстояния ради выравнивания низа колонок:
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{0pt}
+\usepackage{indentfirst}
 \raggedbottom
-% --- Формулы: размеры 11/7/5 ---
+
+% --- Формулы ---
 \DeclareMathSizes{11}{11}{7}{5}
-% --- Подписи рисунков и таблиц: 10 pt, bold, одинарный ---
+
+% --- Рисунки/таблицы ---
+\usepackage{graphicx}
 \usepackage[font={small,bf},labelsep=period]{caption}
 \addto\captionsrussian{\renewcommand\figurename{Рис.}}
 \addto\captionsrussian{\renewcommand\tablename{Таблица}}
-% --- Графика ---
-\usepackage{graphicx}
-% --- Ссылки в квадратных скобках [1], порядок по цитированию ---
+
+% --- Ссылки ---
 \usepackage{cite}
-% --- Удобные макросы для шапки ---
-\newcommand{\udc}[1]{\noindent\textbf{УДК #1}\par\vspace{0.75em}}
-\newcommand{\ruTitle}[1]{\begin{center}\textbf{\Large #1}\end{center}\vspace{0.25em}}
-\newcommand{\enTitle}[1]{\begin{center}\textbf{\Large #1}\end{center}\vspace{0.25em}}
-\newcommand{\ruAuthors}[1]{\begin{center}\textbf{#1}\end{center}\vspace{0.5em}}
-\newcommand{\enAuthors}[1]{\begin{center}\textbf{#1}\end{center}\vspace{0.5em}}
-\newcommand{\ruAbstract}[1]{\noindent\textbf{Резюме.} \textit{#1}\par\vspace{0.5em}}
-\newcommand{\enAbstract}[1]{\noindent\textbf{Abstract.} \textit{#1}\par\vspace{0.5em}}
-\newcommand{\ruKeywords}[1]{\noindent\textbf{Ключевые слова:} #1\par\vspace{0.75em}}
-\newcommand{\enKeywords}[1]{\noindent\textbf{Keywords:} #1\par\vspace{1.25em}}
 
-\usepackage{titlesec}
-
-\usepackage{titlesec}
-
+% --- Заголовки разделов ---
 \usepackage{titlesec}
 
 \titleformat{\section}
-{\bfseries\normalsize}
+{\bfseries\fontsize{11}{11}\selectfont}
 {}
 {0pt}
 {}
@@ -63,12 +51,87 @@ columnsep=0.5cm
 {0pt}
 
 \titleformat{\subsection}
-{\bfseries\normalsize}
+{\bfseries\fontsize{11}{11}\selectfont}
 {}
 {0pt}
 {}
 
 \titlespacing*{\subsection}
 {0pt}
-{0.75\baselineskip}
+{\baselineskip}
 {0pt}
+
+% --- Оформление шапки статьи ---
+\newcommand{\udc}[1]{%
+	\noindent\textbf{УДК #1}\par\vspace{0.5em}
+}
+
+% Заголовок статьи: жирный, по левому краю, как на фото
+\newcommand{\ruTitle}[1]{%
+	\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}
+}
+
+\newcommand{\enTitle}[1]{%
+	\noindent{\bfseries\fontsize{12}{13}\selectfont #1}\par\vspace{0.75em}
+}
+
+% Авторы: жирные, по левому краю
+\newcommand{\ruAuthors}[1]{%
+	\noindent{\bfseries #1}\par
+}
+
+\newcommand{\enAuthors}[1]{%
+	\noindent{\bfseries #1}\par
+}
+
+% Аффилиации: курсив, компактно, по левому краю
+\newcommand{\ruAffiliations}[1]{%
+	\noindent{\itshape\small #1}\par\vspace{0.5em}
+}
+
+\newcommand{\enAffiliations}[1]{%
+	\noindent{\itshape\small #1}\par\vspace{0.5em}
+}
+
+% Email
+\newcommand{\AuthorEmail}[1]{%
+	\noindent{\small #1}\par\vspace{0.75em}
+}
+
+% Резюме: заголовок жирный, текст обычный
+\newcommand{\ruAbstract}[1]{%
+	\noindent\textbf{Резюме}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+\newcommand{\enAbstract}[1]{%
+	\noindent\textbf{Abstract}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+% Ключевые слова
+\newcommand{\ruKeywords}[1]{%
+	\noindent\textbf{Ключевые слова}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+\newcommand{\enKeywords}[1]{%
+	\noindent\textbf{Keywords}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+% Доп. служебные блоки
+\newcommand{\ForCitation}[1]{%
+	\noindent\textbf{Для цитирования}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+\newcommand{\ArticleInfo}[1]{%
+	\noindent\textbf{Информация о статье}\par
+	\noindent #1\par\vspace{0.75em}
+}
+
+\newcommand{\Acknowledgements}[1]{%
+	\noindent\textbf{Благодарность}\par
+	\noindent #1\par\vspace{0.75em}
+}
