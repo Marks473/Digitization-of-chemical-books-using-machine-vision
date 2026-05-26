@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MAIN_TEX="main.tex"
+MAIN_PDF="main.pdf"
+MONOLITH_TEX="monolith.tex"
+
+echo "==> Сборка PDF из ${MAIN_TEX}"
+latexmk -pdf -interaction=nonstopmode -halt-on-error "${MAIN_TEX}"
+
+echo "==> Генерация монолита ${MONOLITH_TEX}"
+tmpfile="$(mktemp)"
+latexpand "${MAIN_TEX}" > "${tmpfile}"
+mv "${tmpfile}" "${MONOLITH_TEX}"
+
+echo "==> Добавление артефактов в commit"
+git add "${MAIN_PDF}" "${MONOLITH_TEX}"
+
+echo "==> OK: PDF, monolith.tex и monolith.docx обновлены"
