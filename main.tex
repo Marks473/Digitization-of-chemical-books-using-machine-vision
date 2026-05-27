@@ -1,18 +1,12 @@
-\documentclass[11pt, twocolumn]{article}
-
+\documentclass[11pt]{article}
 \input{preamble.tex}
 \input{user_preamble.tex} 
 
 \begin{document}
 	
-\raggedbottom
-\setlength{\parskip}{0pt}
-\twocolumn[{
-	\begin{minipage}{\textwidth}
-		\input{tit.tex}
-		\vspace{2em} % Отступ перед основным текстом
-	\end{minipage}
-}]
+
+\input{tit.tex}
+\begin{multicols}{2}	
 
 \input{chapter/introduction.tex}
 
@@ -74,8 +68,7 @@
 
 % \input{paragraph/demo.tex}
 
-
-\onecolumn
+\end{multicols}
 	\begin{center}
 		\textbf{Список литературы}
 	\end{center}

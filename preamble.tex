@@ -11,6 +11,9 @@ left=1.75cm,right=1.75cm,
 columnsep=0.5cm
 ]{geometry}
 
+% НОВЫЙ ПАКЕТ: Для правильной двухколоночной верстки после длинной шапки
+\usepackage{multicol}
+
 % --- Шрифты ---
 \usepackage{tempora}
 \usepackage{newtxmath}
@@ -32,12 +35,7 @@ columnsep=0.5cm
 \usepackage[font={small,bf},labelsep=period]{caption}
 \addto\captionsrussian{\renewcommand\figurename{Рис.}}
 \addto\captionsrussian{\renewcommand\tablename{Таблица}}
-
-% НОВЫЙ ПАКЕТ: Улучшает размещение плавающих объектов на всю ширину (позволяет ставить их вниз страницы [b])
 \usepackage{stfloats} 
-
-% --- Вставки на всю ширину страницы ---
-% НОВЫЙ ПАКЕТ: Позволяет размещать текст (например, список литературы) на всю ширину в двухколоночном документе
 \usepackage{cuted} 
 
 % --- Ссылки ---
@@ -45,79 +43,29 @@ columnsep=0.5cm
 
 % --- Заголовки разделов ---
 \usepackage{titlesec}
-\titleformat{\section}
-{\bfseries\fontsize{11}{11}\selectfont}
-{}
-{0pt}
-{}
-\titlespacing*{\section}
-{0pt}
-{\baselineskip}
-{0pt}
-
-\titleformat{\subsection}
-{\bfseries\fontsize{11}{11}\selectfont}
-{}
-{0pt}
-{}
-\titlespacing*{\subsection}
-{0pt}
-{\baselineskip}
-{0pt}
+\titleformat{\section}{\bfseries\fontsize{11}{11}\selectfont}{}{0pt}{}
+\titlespacing*{\section}{0pt}{\baselineskip}{0pt}
+\titleformat{\subsection}{\bfseries\fontsize{11}{11}\selectfont}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{\baselineskip}{0pt}
 
 % --- Оформление шапки статьи ---
-\newcommand{\udc}[1]{%
-	\noindent\textbf{УДК #1}\par\vspace{0.5em}
-}
-\newcommand{\ruTitle}[1]{%
-	\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}
-}
-\newcommand{\enTitle}[1]{%
-	\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}
-}
-\newcommand{\ruAuthors}[1]{%
-	\noindent{\bfseries #1}\par
-}
-\newcommand{\enAuthors}[1]{%
-	\noindent{\bfseries #1}\par
-}
-\newcommand{\ruAffiliations}[1]{%
-	\noindent{\itshape\small #1}\par\vspace{0.5em}
-}
-\newcommand{\enAffiliations}[1]{%
-	\noindent{\itshape\small #1}\par\vspace{0.5em}
-}
-\newcommand{\AuthorEmail}[1]{%
-	\noindent{\small #1}\par\vspace{0.75em}
-}
-\newcommand{\ruAbstract}[1]{%
-	\noindent\textbf{Резюме}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\enAbstract}[1]{%
-	\noindent\textbf{Abstract}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ruKeywords}[1]{%
-	\noindent\textbf{Ключевые слова}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\enKeywords}[1]{%
-	\noindent\textbf{Keywords}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ForCitation}[1]{%
-	\noindent\textbf{Для цитирования}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ArticleInfo}[1]{%
-	\noindent\textbf{Информация о статье}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\Acknowledgements}[1]{%
-	\noindent\textbf{Благодарность}\par
-	\noindent #1\par\vspace{0.75em}
-}
+\newcommand{\udc}[1]{\noindent\textbf{УДК #1}\par\vspace{0.5em}}
+\newcommand{\ruTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}}
+\newcommand{\enTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}}
+\newcommand{\ruAuthors}[1]{\noindent{\bfseries #1}\par}
+\newcommand{\enAuthors}[1]{\noindent{\bfseries #1}\par}
+\newcommand{\ruAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}}
+\newcommand{\enAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}}
+\newcommand{\AuthorEmail}[1]{\noindent{\small #1}\par\vspace{0.75em}}
+\newcommand{\ruAbstract}[1]{\noindent\textbf{Резюме}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\enAbstract}[1]{\noindent\textbf{Abstract}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ruKeywords}[1]{\noindent\textbf{Ключевые слова}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\enKeywords}[1]{\noindent\textbf{Keywords}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ForCitation}[1]{\noindent\textbf{Для цитирования}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ArticleInfo}[1]{\noindent\textbf{Информация о статье}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\Acknowledgements}[1]{\noindent\textbf{Благодарность}\par\noindent #1\par\vspace{0.75em}}
+
+% --- Библиография и подписи ---
 \makeatletter
 \renewenvironment{thebibliography}[1]
 {\list{\@biblabel{\@arabic\c@enumiv}}%
@@ -139,7 +87,7 @@ columnsep=0.5cm
 
 \newcommand{\bicaption}[2]{%
 	\caption{#1}%
-	\vspace{-0.7em} % <--- Регулируй этот параметр (например, -0.5em, 0pt, 0.2cm)
+	\vspace{-0.7em} 
 	{\captionsetup{labelformat=empty}
 		\caption*{\textbf{Fig.~\thefigure.} #2}}
 }

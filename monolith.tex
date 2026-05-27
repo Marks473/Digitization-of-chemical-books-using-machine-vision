@@ -1,5 +1,4 @@
-\documentclass[11pt, twocolumn]{article}
-
+\documentclass[11pt]{article}
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
@@ -10,6 +9,8 @@ top=2.5cm,bottom=2.5cm,
 left=1.75cm,right=1.75cm,
 columnsep=0.5cm
 ]{geometry}
+
+\usepackage{multicol}
 
 \usepackage{tempora}
 \usepackage{newtxmath}
@@ -28,71 +29,33 @@ columnsep=0.5cm
 \usepackage[font={small,bf},labelsep=period]{caption}
 \addto\captionsrussian{\renewcommand\figurename{Рис.}}
 \addto\captionsrussian{\renewcommand\tablename{Таблица}}
-
 \usepackage{stfloats} 
-
 \usepackage{cuted} 
 
 \usepackage{cite}
 
 \usepackage{titlesec}
-\titleformat{\section}
-{\bfseries\fontsize{11}{11}\selectfont}
-{}
-{0pt}
-{}
-\titlespacing*{\section}
-{0pt}
-{\baselineskip}
-{0pt}
+\titleformat{\section}{\bfseries\fontsize{11}{11}\selectfont}{}{0pt}{}
+\titlespacing*{\section}{0pt}{\baselineskip}{0pt}
+\titleformat{\subsection}{\bfseries\fontsize{11}{11}\selectfont}{}{0pt}{}
+\titlespacing*{\subsection}{0pt}{\baselineskip}{0pt}
 
-\titleformat{\subsection}
-{\bfseries\fontsize{11}{11}\selectfont}
-{}
-{0pt}
-{}
-\titlespacing*{\subsection}
-{0pt}
-{\baselineskip}
-{0pt}
+\newcommand{\udc}[1]{\noindent\textbf{УДК #1}\par\vspace{0.5em}}
+\newcommand{\ruTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}}
+\newcommand{\enTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}}
+\newcommand{\ruAuthors}[1]{\noindent{\bfseries #1}\par}
+\newcommand{\enAuthors}[1]{\noindent{\bfseries #1}\par}
+\newcommand{\ruAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}}
+\newcommand{\enAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}}
+\newcommand{\AuthorEmail}[1]{\noindent{\small #1}\par\vspace{0.75em}}
+\newcommand{\ruAbstract}[1]{\noindent\textbf{Резюме}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\enAbstract}[1]{\noindent\textbf{Abstract}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ruKeywords}[1]{\noindent\textbf{Ключевые слова}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\enKeywords}[1]{\noindent\textbf{Keywords}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ForCitation}[1]{\noindent\textbf{Для цитирования}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\ArticleInfo}[1]{\noindent\textbf{Информация о статье}\par\noindent #1\par\vspace{0.75em}}
+\newcommand{\Acknowledgements}[1]{\noindent\textbf{Благодарность}\par\noindent #1\par\vspace{0.75em}}
 
-\newcommand{\udc}[1]{\noindent\textbf{УДК #1}\par\vspace{0.5em}
-}
-\newcommand{\ruTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}
-}
-\newcommand{\enTitle}[1]{\noindent{\bfseries\fontsize{14}{15}\selectfont #1}\par\vspace{0.75em}
-}
-\newcommand{\ruAuthors}[1]{\noindent{\bfseries #1}\par
-}
-\newcommand{\enAuthors}[1]{\noindent{\bfseries #1}\par
-}
-\newcommand{\ruAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}
-}
-\newcommand{\enAffiliations}[1]{\noindent{\itshape\small #1}\par\vspace{0.5em}
-}
-\newcommand{\AuthorEmail}[1]{\noindent{\small #1}\par\vspace{0.75em}
-}
-\newcommand{\ruAbstract}[1]{\noindent\textbf{Резюме}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\enAbstract}[1]{\noindent\textbf{Abstract}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ruKeywords}[1]{\noindent\textbf{Ключевые слова}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\enKeywords}[1]{\noindent\textbf{Keywords}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ForCitation}[1]{\noindent\textbf{Для цитирования}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\ArticleInfo}[1]{\noindent\textbf{Информация о статье}\par
-	\noindent #1\par\vspace{0.75em}
-}
-\newcommand{\Acknowledgements}[1]{\noindent\textbf{Благодарность}\par
-	\noindent #1\par\vspace{0.75em}
-}
 \makeatletter
 \renewenvironment{thebibliography}[1]
 {\list{\@biblabel{\@arabic\c@enumiv}}{\settowidth\labelwidth{\@biblabel{#1}}\leftmargin\labelwidth
@@ -107,7 +70,8 @@ columnsep=0.5cm
 	{\@latex@warning{Empty `thebibliography' environment}}\endlist}
 \makeatother
 
-\newcommand{\bicaption}[2]{\caption{#1}\vspace{-0.7em} {\captionsetup{labelformat=empty}
+\newcommand{\bicaption}[2]{\caption{#1}\vspace{-0.7em} 
+	{\captionsetup{labelformat=empty}
 		\caption*{\textbf{Fig.~\thefigure.} #2}}
 } \usepackage{comment}
 \usepackage{color}
@@ -116,11 +80,8 @@ columnsep=0.5cm
 \usepackage{multirow} 
 \begin{document}
 	
-\raggedbottom
-\setlength{\parskip}{0pt}
-\twocolumn[{
-	\begin{minipage}{\textwidth}
-		\udc{004.9}
+
+\udc{004.9}
 
 \ruTitle{ОЦИФРОВКА ХИМИЧЕСКИХ КНИГ С ИСПОЛЬЗОВАНИЕМ МАШИННОГО ЗРЕНИЯ}
 
@@ -157,8 +118,7 @@ We propose an approach to constructing a chemical document processing pipeline t
 
 We demonstrate that a combination of image preprocessing methods, chemical structure recognition models, and postprocessing steps improves the quality of information extraction and prepares data for further analysis, retrieval, and integration into intelligent information systems. The obtained results can be used in the development of software for the digitalization of chemical literature and the creation of knowledge bases based on scientific publications. }
 
-\enKeywords{chemical literature digitization, machine vision, page image analysis, OCR, OCSR, chemical structure recognition, page segmentation, image preprocessing, text normalization, SMILES, chemical informatics, intelligent search. } 		\vspace{2em} \end{minipage}
-}]
+\enKeywords{chemical literature digitization, machine vision, page image analysis, OCR, OCSR, chemical structure recognition, page segmentation, image preprocessing, text normalization, SMILES, chemical informatics, intelligent search. } \begin{multicols}{2}	
 
 \section*{Введение}
 Знания, содержащиеся в химических книгах, монографиях и архивных выпусках журналов, сохраняют высокую научную и практическую ценность: в них зафиксированы методики синтеза, экспериментальные наблюдения, справочные сведения о веществах и их свойствах, а также контекст, необходимый для воспроизводимости результатов. При этом существенная часть такого корпуса литературы до сих пор существует в виде физических изданий или в виде сканированных книг, которые удобны для чтения человеком, но плохо приспособлены для автоматизированного анализа и интеграции в современные информационные системы.
@@ -460,7 +420,7 @@ We demonstrate that a combination of image preprocessing methods, chemical struc
 Таким образом, проведенный эксперимент показывает, что наибольший вклад в улучшение качества распознавания вносит этап постобработки текста, особенно при использовании YandexGPT 5 Lite. Адаптивная предобработка изображения также является полезной, но ее максимальный эффект проявляется именно в составе комбинированного конвейера. По совокупности результатов наиболее эффективной следует признать конфигурацию \textit{OCR+пре+норм}. 
 Для апробации распознания химических формул проведён тест на десяти изображениях с подробной нотацией и десяти изображениях со скелетной. В тесте используются трех моделей: \textit{MolScribe}, \textit{DECIMER} и \textit{Qwen3VL}. Для каждой модели сравнивались результаты распознавания без предобработки и с применением адаптивной предобработки изображения (см.~таб.~\ref{tab:chem_models_compare}).
 
-\begin{table*}[h]
+\begin{table*}[b]
 	\centering
 	\small
 	\setlength{\tabcolsep}{4pt}
@@ -501,8 +461,7 @@ We demonstrate that a combination of image preprocessing methods, chemical struc
 В результате проведенного исследования показана практическая значимость комплексного подхода к оцифровке химической литературы. Разработанная схема обработки может быть использована как основа для создания программной системы, обеспечивающей автоматическое извлечение текстовой и структурной химической информации из сканированных документов. Перспективными направлениями дальнейшей работы являются расширение набора тестовых данных, повышение точности сегментации сложных страниц, улучшение качества распознавания дефектных изображений, а также интеграция полученных данных в системы семантического поиска и анализа химической информации.  
 
 
-
-\onecolumn
+\end{multicols}
 	\begin{center}
 		\textbf{Список литературы}
 	\end{center}
