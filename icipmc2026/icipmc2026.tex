@@ -1,0 +1,195 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+\newcommand{\email}[1]{\texttt{#1}}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A Local-Deployable Pipeline for Text and Chemical\\Structure Extraction from Scanned Books}
+
+\author{
+\IEEEauthorblockN{Ivan Trofimov$^{1,3}$}\and
+\IEEEauthorblockN{Mikhail Alakshin$^{1,3}$}\and
+\IEEEauthorblockN{Evgeny Cherkashin$^{1-4}$}\and
+\IEEEauthorblockN{Alexander Rybak$^{1,3}$}\and
+\IEEEauthorblockN{Dmitry Tkachev$^{1,3}$}\and
+\IEEEauthorblockN{Shimin Zhao$^{2}$}\and
+\IEEEauthorblockA{
+$^{1}$Favorsky Institute of Chemistry, Siberian Branch of RAS, Irkutsk, Russia\\
+$^{3}$School of Mathematics and Information Sciences, Yantai University, Yantai, China\\
+$^{2}$Irkutsk State University, Irkutsk, Russia\\
+$^{4}$Matrosov Institute for System Dynamics and Control Theory, Siberian Branch of RAS, Irkutsk, Russia\\
+\email{eugeneai@icc.ru}
+}
+\thanks{Corresponding author: E. A. Cherkashin.}
+}
+
+\maketitle
+
+\begin{abstract}
+This paper addresses the automated digitization of chemical literature using machine vision. A significant portion of chemical information resides in scanned books containing not only text but also structural formulas, reaction schemes, and tables, which require specialized processing beyond conventional OCR. We propose a comprehensive pipeline comprising adaptive image preprocessing, page segmentation, dual-stream recognition (OCR for text, OCSR for chemical structures), and postprocessing with heuristics and large language models. Experimental evaluation on a dataset of scanned chemical pages compares preprocessing configurations, segmentation methods, and three OCSR models (MolScribe, DECIMER, Qwen3-VL). Results show that combined preprocessing and LLM-based text normalization improves OCR accuracy by 35\% on average, while OCSR model choice depends on molecular notation type and preprocessing strategy.
+\end{abstract}
+
+\begin{IEEEkeywords}
+chemical literature digitization, machine vision, OCR, OCSR, page segmentation, SMILES, image preprocessing
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Knowledge preserved in chemical books, monographs, and archival journals retains high scientific value: synthesis methods, experimental observations, and reference data essential for reproducibility. Much of this corpus exists only as physical copies or scanned documents---readable by humans but poorly suited for automated analysis and integration into modern information systems \cite{refDavletovEn,refKuchuganovEn}. Current digitization efforts typically produce searchable PDFs via OCR, enabling only superficial text search. However, in chemical literature a substantial portion of information is conveyed through graphical objects: structural formulas, reaction schemes, and molecular diagrams. If these elements are not converted to machine-readable representations, the majority of the document's semantic content remains outside the digital domain \cite{refKuchuganovEn}.
+
+This paper presents a comprehensive pipeline for digitizing scanned chemical literature that goes beyond text extraction to also recognize and structure graphical chemical information. The main contributions are: (1) an adaptive image preprocessing algorithm that automatically adjusts parameters based on estimated character height; (2) a heuristic page segmentation method tailored to the vertical block layout typical of scientific publications; (3) a comparison of dual-stream recognition approaches combining OCR with three OCSR models---MolScribe, DECIMER, and Qwen3-VL; and (4) an evaluation of LLM-based postprocessing for OCR error correction.
+
+\section{Related Work}
+
+Document digitization has been extensively studied, with systems evolving from classical rule-based approaches to deep learning pipelines. In page segmentation, the Recursive X-Y Cut algorithm \cite{refXYCutEn} and Run-Length Smoothing Algorithm (RLSA) \cite{refRLSAEn} are foundational methods that exploit whitespace and connected-component proximity. More recently, LayoutParser \cite{refLayoutParserEn} provides a unified deep learning toolkit for detecting document layout elements, while MinerU \cite{refMinerUEn} offers end-to-end extraction from complex scientific publications. LayoutLM \cite{refLayoutLMEn} extends this by jointly pretraining text and layout for document understanding tasks. However, these general-purpose tools are not optimized for the specific visual vocabulary of chemical documents, where structural formulas and reaction schemes require specialized treatment.
+
+Optical chemical structure recognition (OCSR) has developed along two main trajectories. Early systems such as OSRA \cite{refOSRAEn} employed image processing heuristics and vectorization to recover molecular graphs from raster images. The field shifted with deep learning: MolScribe \cite{refMolScribeEn} formulates OCSR as image-to-graph generation, directly predicting atoms, bonds, and stereochemistry from visual features. DECIMER \cite{refDECIMEREn,refDECIMERJournalEn} takes a sequence-to-sequence approach, generating SELFIES strings from chemical images via transformer architectures. Vision-language models, exemplified by Qwen3-VL \cite{refQwen3VLEn} and LLaVA \cite{refLlavaEn}, have been applied to chemical image understanding through few-shot in-context learning, demonstrating the potential of multimodal foundation models for domain-specific recognition tasks. Reaction segmentation, a related subproblem, has been addressed by RxnScribe \cite{refRxnScribeEn}, which identifies reagent, condition, and product regions in reaction schemes.
+
+Despite these advances, most existing systems address only a single modality---either text extraction or chemical structure recognition---and assume clean, pre-segmented input images. A complete digitization pipeline for chemical literature must integrate preprocessing, segmentation, and both recognition streams while handling the variable quality of scanned archival documents. This paper addresses that gap by presenting a unified pipeline that combines adaptive image preprocessing, page segmentation, dual-stream OCR/OCSR, and LLM-based postprocessing, with an experimental comparison of multiple OCSR models on realistic scanned data.
+
+\section{Pipeline Architecture}
+
+The proposed processing pipeline follows a sequential architecture. A scanned page image first undergoes adaptive preprocessing to correct common defects: blur, noise, uneven illumination, and page skew. The enhanced image enters a segmentation stage that splits the page into homogeneous horizontal blocks. Each block is classified as text or non-text. Non-text blocks---containing chemical structures---are routed to an OCSR model that converts molecular images to canon\-ical SMILES strings via RDKit; the process includes optional splitting of reaction schemes into individual molecules using RxnScribe, individual OCSR on each, and reassembly into a reaction SMILES. Text blocks are processed by an OCR engine (EasyOCR), followed by optional postprocessing via heuristic rules or a large language model (YandexGPT 5 Lite). The final stage assembles the recognized text and chemical representations into a machine-readable dataset in Markdown or JSON format, linking each extracted element back to its spatial location on the original page. This structured output is suitable for indexing, semantic search, and retrieval-augmented generation over chemical knowledge bases.
+
+The software is implemented in Python using object-oriented design principles \cite{refGoFEn}. All OCSR and language models are deployed locally to ensure data sovereignty and system autonomy \cite{refTrofimovEn}.
+
+\section{Methodology}
+
+\subsection{Adaptive Image Preprocessing}
+
+Scanned chemical books exhibit highly variable quality: low resolution, noise, compression artifacts, uneven lighting, and page skew \cite{refAkhilEn}. We propose an adaptive preprocessing algorithm that eliminates manual parameter tuning. The algorithm begins by converting the image to grayscale and applying Otsu thresholding to obtain a coarse binary mask. Connected component analysis on this mask estimates the median character height, which serves as the primary control parameter for all subsequent operations.
+
+The image is scaled so that the estimated character height reaches a target of 40 pixels. Adaptive binarization uses a window size proportional to four character heights. Noise reduction, contrast enhancement, and sharpening are automatically adjusted based on the scaling factor: pages with smaller original text receive stronger correction. Morphological operations are scaled similarly, with one pass for removing artifacts and another for reconnecting fragmented characters. Skew correction is applied by default. The same algorithm operates in two modes: for text, parameters favor aggressive readability improvement; for chemical structures, filtering is conservative to preserve bond topology and molecular geometry.
+
+\subsection{Page Segmentation}
+
+Chemical page layout follows a predominantly vertical block structure: text paragraphs, headings, tables, figures, and chemical schemes appear as full-width horizontal bands separated by blank gaps. Our segmentation method exploits this regularity. After adaptive binarization and morphological closing with a horizontal kernel, a vertical projection profile is computed. Rows with pixel density below a threshold (a fraction of page width) are marked as empty. Contiguous empty runs narrower than a minimum gap (derived from estimated line height) are suppressed to avoid splitting within text blocks. The remaining gaps define cut lines that partition the page into horizontal blocks.
+
+Each block is classified as text or non-text using two features: pixel density and the count of small connected components. Text blocks typically have lower density and numerous small components (individual characters). Non-text blocks---chemical diagrams, reaction schemes, illustrations---exhibit higher density and fewer, larger components. This heuristic, while not universally accurate for complex multi-column layouts, is computationally efficient and well-suited to the structure of scientific monographs \cite{refLayoutParserEn}.
+
+\subsection{Text Recognition and Postprocessing}
+
+Text recognition uses EasyOCR, an open-source OCR engine supporting multiple languages. To improve recognition quality on degraded scans, we evaluate two postprocessing strategies \cite{refOCRMetricsEn}. The first is heuristic normalization: a rule-based pipeline that removes artifacts, normalizes whitespace and punctuation, and corrects common character confusions. The second employs YandexGPT 5 Lite, a large language model, instructed to fix OCR errors while preserving the original meaning and structure. The LLM-based approach handles context-dependent errors more effectively but requires careful prompt engineering to avoid free reformulation.
+
+\subsection{Chemical Structure Recognition}
+
+Chemical structures in scanned documents appear in two primary notations: detailed (showing all atoms and bonds explicitly) and skeletal (carbon atoms implied at line vertices and termini) \cite{refLineAngleEn,refWarrEn}. The goal of optical chemical structure recognition (OCSR) is to convert these depictions into a machine-readable molecular graph. We adopt SMILES \cite{refWeininger1En} as the target representation due to its compactness, human readability, and broad ecosystem support. To resolve SMILES ambiguity---the same molecule can be represented by multiple strings---we apply canonicalization via RDKit \cite{refOBoyleCanonicalEn,refWeininger2En}.
+
+Three OCSR models are evaluated:
+\begin{itemize}
+\item \textbf{MolScribe} \cite{refMolScribeEn}: a graph-oriented approach that reconstructs the molecular graph directly from visual features, explicitly modeling atoms, bonds, aromaticity, charges, and stereochemistry.
+\item \textbf{DECIMER} \cite{refDECIMEREn,refDECIMERJournalEn}: a deep learning model trained on synthetic data that generates SELFIES (a robust string representation) from chemical images, then converts to SMILES.
+\item \textbf{Qwen3-VL} \cite{refQwen3VLEn}: a multimodal vision-language model applied to OCSR via few-shot in-context learning, provided with a system prompt and several demonstration examples.
+\end{itemize}
+All models run locally. MolScribe and DECIMER use their native image processing pipelines; Qwen3-VL is accessed programmatically through its API.
+
+\section{Experimental Results}
+
+\subsection{OCR Accuracy}
+
+Text recognition was evaluated on ten scanned pages using six configurations: baseline EasyOCR (OCR), with adaptive preprocessing (OCR+Pre), with LLM-based normalization (OCR+Norm), with heuristic normalization (OCR+NormE), and two combined schemes. Quality is measured using $1 - \text{WER}$ (Word Error Rate), where 1.0 indicates perfect recognition.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{OCR accuracy ($1 - \text{WER}$) across configurations. Best per row in bold.}
+\label{tab:ocr}
+\begin{tabular}{lcccccc}
+\toprule
+Test & OCR & +Pre & +Norm & +NormE & +Pre+NormE & \textbf{+Pre+Norm} \\
+\midrule
+1 & 0.1603 & 0.4737 & 0.5465 & 0.1603 & 0.4503 & \textbf{0.9394} \\
+2 & 0.1742 & 0.5023 & 0.4838 & 0.1559 & 0.4909 & \textbf{0.8909} \\
+3 & 0.2151 & 0.0154 & 0.3588 & 0.2000 & 0.0310 & \textbf{0.4113} \\
+4 & 0.8734 & 0.8518 & 0.9240 & 0.8734 & 0.8500 & \textbf{0.9500} \\
+5 & 0.6488 & 0.7610 & 0.8750 & 0.5780 & 0.7121 & \textbf{0.9212} \\
+6 & 0.7091 & 0.6139 & 0.9643 & 0.7529 & 0.6450 & 0.8060 \\
+7 & 0.2100 & 0.3986 & 0.3720 & 0.1995 & 0.4203 & \textbf{0.8711} \\
+8 & 0.3656 & 0.0000 & 0.7923 & 0.3771 & 0.0000 & 0.0538 \\
+9 & 0.7210 & 0.7812 & 0.8785 & 0.7494 & 0.8031 & \textbf{0.8976} \\
+10 & 0.0636 & 0.3476 & 0.4295 & 0.0266 & 0.3523 & \textbf{0.9516} \\
+\midrule
+Mean & 0.4141 & 0.4746 & 0.6625 & 0.4073 & 0.4755 & \textbf{0.7693} \\
+Std.~Dev. & 0.2936 & 0.2975 & 0.2460 & 0.3053 & 0.2935 & 0.2983 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Table~\ref{tab:ocr} shows that the combined configuration \textit{OCR+Pre+Norm} achieves the highest mean accuracy (0.7693), which is 35\% above baseline. LLM-based normalization alone (OCR+Norm) also performs well with the lowest standard deviation, indicating stable improvements across diverse image qualities. Preprocessing alone provides modest gains, while heuristic normalization underperforms LLM-based correction in both mean accuracy and consistency.
+
+\subsection{OCSR Accuracy}
+
+Chemical structure recognition was tested on 20 images: 10 with detailed notation and 10 with skeletal notation. Each of the three models was evaluated with and without adaptive preprocessing.
+
+\begin{table*}[t]
+\centering
+\small
+\caption{OCSR accuracy (correct/total) by model and notation type.}
+\label{tab:ocsr}
+\begin{tabular}{lcccccc}
+\toprule
+\multirow{2}{*}{Model} & \multicolumn{3}{c}{Without Preprocessing} & \multicolumn{3}{c}{With Preprocessing} \\
+\cline{2-7}
+ & Detailed & Skeletal & Total & Detailed & Skeletal & Total \\
+\midrule
+MolScribe & 8/10 & 10/10 & \textbf{18/20} & 5/10 & 9/10 & 14/20 \\
+DECIMER & 2/10 & 4/10 & 6/20 & 4/10 & 2/10 & 6/20 \\
+Qwen3-VL & 3/10 & 3/10 & 6/20 & 4/10 & 3/10 & 7/20 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+As shown in Table~\ref{tab:ocsr}, MolScribe significantly outperforms the other two models, achieving 18/20 without preprocessing and perfect recognition on skeletal formulas. Notably, preprocessing did not universally improve OCSR quality: MolScribe's accuracy dropped from 18/20 to 14/20 after preprocessing, suggesting that the model's native image handling is better suited to raw scans. DECIMER's total score remained unchanged (6/20) with a shift in distribution, while Qwen3-VL showed a slight improvement (6/20 to 7/20). These results indicate that OCSR preprocessing requirements are model-dependent and require per-model tuning rather than a one-size-fits-all approach.
+
+\section{Limitations and Discussion}
+
+The experimental evaluation in this study is based on a limited dataset of 10 text pages and 20 chemical structure images. This reflects the project's early stage---approximately six months of active development---where the primary goal was to establish a working pipeline architecture and obtain preliminary comparative results rather than statistically rigorous benchmarking. The observed trends---superiority of combined preprocessing with LLM-based postprocessing for OCR, and MolScribe's dominance for OCSR---are consistent enough to guide further development but should be validated on larger, more diverse collections of scanned chemical literature.
+
+A deliberate design constraint throughout this work is the preference for locally deployable models. All OCSR models (MolScribe, DECIMER, Qwen3-VL) and the LLM used for text normalization (YandexGPT 5 Lite) are capable of running on consumer-grade hardware without cloud dependencies. This choice is motivated by data sovereignty: chemical literature may contain proprietary synthesis routes or unpublished experimental data, and many institutional environments restrict internet access. Smaller local models, however, inevitably trade accuracy for deployability. Future work will explore model distillation, quantization, and fine-tuning on domain-specific data to improve accuracy while preserving the locality advantage.
+
+Several additional limitations should be acknowledged. Page segmentation currently relies on a heuristic full-width block assumption, which fails for multi-column layouts and complex page designs; replacing it with a learned segmentation model (e.g., LayoutParser) is a natural improvement. OCR and OCSR accuracy were evaluated on isolated page regions rather than through end-to-end tests on complete pages. OCSR models were used in their pre-trained form without fine-tuning on the specific dataset, which likely understates the achievable performance of DECIMER and Qwen3-VL. Finally, the OCR comparison was limited to EasyOCR; a broader evaluation including Tesseract, PaddleOCR, and other engines would strengthen the analysis.
+
+\section{Conclusion}
+
+We presented a comprehensive pipeline for digitizing chemical literature that integrates adaptive image preprocessing, page segmentation, dual-stream text and chemical structure recognition, and LLM-based postprocessing---all designed for local deployment. Experimental results show that combining adaptive preprocessing with LLM-based normalization improves OCR accuracy by 35\% over baseline, while MolScribe achieves the highest OCSR accuracy among the three models tested. Despite the current limitations in dataset scale and segmentation generality, the proposed architecture provides a practical foundation for building production-level digitization systems. Ongoing work focuses on expanding the annotated dataset, integrating learned segmentation, and connecting the pipeline to semantic search and retrieval-augmented generation over chemical knowledge bases.
+
+\begin{thebibliography}{99}
+\bibitem{refDavletovEn} A.~R.~Davletov, ``Machine learning and OCR for automated document processing and data extraction,'' 2023. [Online]. Available: https://davletov.tech/ocr-ml
+\bibitem{refKuchuganovEn} A.~V.~Kuchuganov, ``Methods and tools for semantic analysis and search of graphic information in document flow systems,'' Ph.D. dissertation, Izhevsk State Tech. Univ., 2015.
+\bibitem{refTrofimovEn} I.~L.~Trofimov \textit{et al.}, ``The role of libraries in the era of artificial intelligence,'' \textit{Bibliosphere}, no.~4, pp.~36--46, 2024.
+\bibitem{refAkhilEn} Akhil, ``Optical character recognition using Tesseract,'' 2022. [Online]. Available: https://medium.com/ @akhilj1810/ocr-using-tesseract
+\bibitem{refWeininger1En} D.~Weininger, ``SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules,'' \textit{J. Chem. Inf. Comput. Sci.}, vol.~28, no.~1, pp.~31--36, 1988.
+\bibitem{refWeininger2En} D.~Weininger \textit{et al.}, ``SMILES. 2. Algorithm for generation of unique SMILES notation,'' \textit{J. Chem. Inf. Comput. Sci.}, vol.~29, no.~2, pp.~97--101, 1989.
+\bibitem{refOBoyleCanonicalEn} N.~M.~O'Boyle, ``Towards a Universal SMILES representation,'' \textit{J. Cheminform.}, vol.~4, p.~22, 2012.
+\bibitem{refMolScribeEn} Y.~Qian \textit{et al.}, ``MolScribe: robust molecular structure recognition with image-to-graph generation,'' \textit{arXiv:2205.14205}, 2022.
+\bibitem{refDECIMEREn} K.~Raja \textit{et al.}, ``DECIMER: deep learning for chemical image recognition,'' \textit{ResearchGate}, 2020.
+\bibitem{refDECIMERJournalEn} O.~Kohulan \textit{et al.}, ``DECIMER.ai: an open platform for automated optical chemical structure identification, segmentation and recognition in scientific publications,'' \textit{J. Cheminform.}, vol.~15, p.~117, 2023.
+\bibitem{refQwen3VLEn} Qwen Team, ``Qwen3-VL technical report,'' \textit{arXiv:2511.21631}, 2025.
+\bibitem{refLayoutParserEn} Z.~Shen \textit{et al.}, ``LayoutParser: a unified toolkit for deep learning based document image analysis,'' \textit{arXiv:2103.15348}, 2021.
+\bibitem{refOCRMetricsEn} R.~Smith, ``An overview of the Tesseract OCR engine,'' in \textit{Proc. 9th Int. Conf. Document Analysis and Recognition (ICDAR)}, 2007, pp.~629--633.
+\bibitem{refGoFEn} E.~Gamma \textit{et al.}, \textit{Design Patterns: Elements of Reusable Object-Oriented Software}. Addison-Wesley, 1994.
+\bibitem{refLineAngleEn} ``Line-angle formula,'' Wikipedia. [Online]. Available: https://en.wikipedia.org/wiki/Skeletal\_formula
+\bibitem{refWarrEn} W.~A.~Warr, ``Representation of chemical structures,'' \textit{WIREs Comput. Mol. Sci.}, vol.~1, no.~4, pp.~557--579, 2011.
+\bibitem{refCAMPEn} C.~Fifty \textit{et al.}, ``Context-aware molecular property prediction: a few-shot approach,'' \textit{arXiv:2002.08773}, 2020.
+\bibitem{refXYCutEn} J.~Ha, R.~M.~Haralick, and I.~T.~Phillips, ``Recursive X-Y cut using bounding boxes of connected components,'' in \textit{Proc. 3rd Int. Conf. Document Analysis and Recognition}, 1995, vol.~2, pp.~952--955.
+\bibitem{refRLSAEn} K.~Y.~Wong, R.~G.~Casey, and F.~M.~Wahl, ``Document analysis system,'' \textit{IBM J. Res. Develop.}, vol.~26, no.~6, pp.~647--656, 1982.
+\bibitem{refLayoutLMEn} Y.~Xu \textit{et al.}, ``LayoutLM: pre-training of text and layout for document image understanding,'' \textit{arXiv:1912.13318}, 2019.
+\bibitem{refMinerUEn} B.~Wang \textit{et al.}, ``MinerU: an open-source solution for precise document content extraction,'' \textit{arXiv:2409.18839}, 2024.
+\bibitem{refOSRAEn} I.~V.~Filippov and M.~Nicklaus, ``Optical structure recognition software to recover chemical information: OSRA, an open source solution,'' \textit{J. Chem. Inf. Model.}, vol.~49, no.~3, pp.~740--743, 2009.
+\bibitem{refRxnScribeEn} Y.~Qian \textit{et al.}, ``RxnScribe: a sequence generation model for reaction diagram parsing,'' \textit{arXiv:2302.11894}, 2023.
+\bibitem{refLlavaEn} H.~Liu \textit{et al.}, ``Visual instruction tuning,'' \textit{arXiv:2305.11845}, 2023.
+\bibitem{refInChIEn} S.~R.~Heller \textit{et al.}, ``InChI, the IUPAC international chemical identifier,'' \textit{J. Cheminform.}, vol.~7, p.~23, 2015.
+\end{thebibliography}
+
+\end{document}
