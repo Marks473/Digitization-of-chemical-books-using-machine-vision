@@ -127,6 +127,14 @@ The pipeline successfully processed a representative sample of reaction schemes 
 
 Fig.~\ref{fig:pipeline_stages} illustrates the end-to-end transformation of a scanned page through each pipeline stage, from raw image to structured text and SMILES output.
 
+\subsection{RAG Retrieval Case Study: Pyrrole Synthesis}
+
+To illustrate the practical utility of the proposed Dual-Stream RAG system, consider a complex user query: ``What are the synthesis conditions and structural intermediates for pyrrole derivatives in superbasic media?'' A standard keyword-based OCR search would miss the structural nuances hidden in historical diagrams.
+
+When this query is processed, the system operates in parallel. The Text-Bibliographic stream searches the vector database (ChromaDB) and retrieves the exact historical text chunks describing the Trofimov reaction methodology---specifically the use of the KOH/DMSO catalytic superbasic system. Simultaneously, the Chemoinformatics stream retrieves the corresponding chemical graphs extracted via OCSR, yielding verified SMILES strings for both the intermediates (e.g., zwitterionic structures) and the final condensed products such as 4,5,6,7-tetrahydroindole (\texttt{C1CCC2=C(C1)C=CN2}).
+
+The local LLM (YandexGPT 5 Lite) then synthesizes these two streams. Because the model is strictly grounded in the retrieved context, it generates a comprehensive, hallucination-free response that describes the synthesis pathway while providing the RDKit-validated structural codes, seamlessly integrating text and chemical topology.
+
 \section{Experimental Validation}
 
 To quantitatively validate the pipeline components, we conducted a controlled evaluation on a test set of 10 text-only page images and 20 chemical structure images (10 in detailed notation, 10 in skeletal notation). The goal was to measure the contribution of each processing stage and compare OCSR model performance under realistic scanning conditions.
@@ -201,7 +209,7 @@ First, the quantitative validation of individual pipeline components was conduct
 
 Second, the lack of standardization in early 20th-century chemical drawings--varying line styles, non-standard abbreviations, and hand-drawn annotations--forces modern VLMs, trained predominantly on contemporary computer-rendered datasets, to occasionally misinterpret archaic notations. This is a fundamental domain shift problem that will require specialized fine-tuning data.
 
-Third, the heuristic page segmentation assumes a full-width horizontal block layout. While appropriate for the monographs in our corpus, this approach struggles with multi-column journal layouts and pages featuring side notes or embedded tables. Transitioning to a fully learned segmentation model (e.g., LayoutLM or YOLO-based) is a priority for future work.
+Third, the current heuristic page segmentation assumes a full-width horizontal block layout. While appropriate for the monographs in our initial corpus, this approach struggles with multi-column journal layouts and pages featuring side notes or embedded tables. To address this limitation, our immediate project roadmap includes the integration of advanced object detection models. Specifically, we are currently compiling an annotated dataset of historical multi-column chemical journals to fine-tune YOLOv8 and Vision Transformer (ViT) architectures. This learned segmentation approach will robustly isolate dense text, complex tables, and chemical graphs prior to the OCSR pipeline, significantly improving the system's adaptability to non-standard archival layouts.
 
 Fourth, running advanced multimodal RAG locally imposes strict VRAM constraints. The concurrent execution of Qwen3-VL, YandexGPT 5 Lite, and OCSR models necessitates careful memory management and occasionally requires quantization techniques (e.g., 4-bit quantization of the LLM) that may slightly degrade reasoning capabilities. Future iterations will explore model distillation and optimized inference frameworks to alleviate this bottleneck.
 

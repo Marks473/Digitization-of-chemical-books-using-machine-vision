@@ -1,0 +1,12 @@
+Response to Reviewer 1:
+
+Comment: The current implementation relies on heuristic rules for page segmentation, which the authors note performs poorly on multi-column journal layouts. To strengthen this work, I recommend briefly outlining a concrete roadmap for integrating advanced models such as LayoutLM or YOLO.
+
+Response: We sincerely thank the reviewer for this constructive suggestion. We completely agree that heuristic rules are a bottleneck for complex archival layouts. In accordance with your recommendation, we have updated Section VIII (Discussion and Limitations) to include a concrete roadmap for our ongoing work. Specifically, we have outlined our scheduled transition to YOLOv8 and Vision Transformer (ViT) architectures, which are currently being fine-tuned on a custom dataset of historical multi-column chemical journals to robustly separate text, tables, and chemical graphs prior to the OCSR pipeline.
+
+
+Response to Reviewer 2:
+
+Comment: To more intuitively illustrate the practical utility of the proposed RAG system, I suggest including one or two specific retrieval case studies. For instance, demonstrating how the system responds to complex queries such as 'the synthesis pathway of pyrrole in superbase media'.
+
+Response: We are highly grateful to the reviewer for this excellent idea. A practical case study significantly strengthens the demonstration of our system's value. We have added a new subsection (V-C. RAG Retrieval Case Study: Pyrrole Synthesis) to Section V. Following your exact suggestion, we detailed how the Dual-Stream RAG architecture handles a query about pyrrole synthesis in superbasic media. We demonstrated how the system concurrently retrieves the textual conditions (KOH/DMSO catalytic system) and the corresponding RDKit-validated SMILES strings (e.g., 4,5,6,7-tetrahydroindole), fusing them into a verified, hallucination-free response.
