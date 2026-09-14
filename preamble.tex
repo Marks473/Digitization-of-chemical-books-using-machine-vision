@@ -32,7 +32,7 @@ columnsep=0.5cm
 
 % --- Рисунки/таблицы ---
 \usepackage{graphicx}
-\usepackage[font={small,bf},labelsep=period]{caption}
+\usepackage[font={small,bf},labelsep=period,singlelinecheck=false]{caption}
 \addto\captionsrussian{\renewcommand\figurename{Рис.}}
 \addto\captionsrussian{\renewcommand\tablename{Таблица}}
 \usepackage{stfloats} 
@@ -85,9 +85,18 @@ columnsep=0.5cm
 	\endlist}
 \makeatother
 
+\makeatletter
+\def\bicaption@tablestr{table}
 \newcommand{\bicaption}[2]{%
 	\caption{#1}%
-	\vspace{-0.7em} 
-	{\captionsetup{labelformat=empty}
-		\caption*{\textbf{Fig.~\thefigure.} #2}}
+	\vspace{-0.7em}
+	{\captionsetup{labelformat=empty}%
+		\edef\bicaption@type{\@captype}%
+		\ifx\bicaption@type\bicaption@tablestr
+			\caption*{\textbf{Table~\thetable.} #2}%
+		\else
+			\caption*{\textbf{Fig.~\thefigure.} #2}%
+		\fi
+	}%
 }
+\makeatother

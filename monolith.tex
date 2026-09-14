@@ -26,7 +26,7 @@ columnsep=0.5cm
 \DeclareMathSizes{11}{11}{7}{5}
 
 \usepackage{graphicx}
-\usepackage[font={small,bf},labelsep=period]{caption}
+\usepackage[font={small,bf},labelsep=period,singlelinecheck=false]{caption}
 \addto\captionsrussian{\renewcommand\figurename{Рис.}}
 \addto\captionsrussian{\renewcommand\tablename{Таблица}}
 \usepackage{stfloats} 
@@ -70,10 +70,14 @@ columnsep=0.5cm
 	{\@latex@warning{Empty `thebibliography' environment}}\endlist}
 \makeatother
 
-\newcommand{\bicaption}[2]{\caption{#1}\vspace{-0.7em} 
-	{\captionsetup{labelformat=empty}
-		\caption*{\textbf{Fig.~\thefigure.} #2}}
-} \usepackage{comment}
+\makeatletter
+\def\bicaption@tablestr{table}
+\newcommand{\bicaption}[2]{\caption{#1}\vspace{-0.7em}
+	{\captionsetup{labelformat=empty}\edef\bicaption@type{\@captype}\ifx\bicaption@type\bicaption@tablestr
+			\caption*{\textbf{Table~\thetable.} #2}\else
+			\caption*{\textbf{Fig.~\thefigure.} #2}\fi
+	}}
+\makeatother \usepackage{comment}
 \usepackage{color}
 \usepackage{placeins}
 \usepackage{graphicx}
@@ -93,11 +97,14 @@ columnsep=0.5cm
 
 
 
-\ruAbstract{В статье рассматривается задача автоматизированной оцифровки химической литературы с использованием методов машинного зрения и анализа изображений. Актуальность работы связана с тем, что значительная часть химической информации содержится в сканированных книгах, статьях и архивных документах, включающих не только текст, но и структурные формулы, реакционные схемы, таблицы и графические элементы, что требует применения специализированных методов обработки.
-Предложен конвейер обработки химических документов, включающий предобработку изображений, сегментацию страниц, выделение текстовых и графических областей, распознавание текста и химических структур, а также преобразование результатов в машиночитаемый формат SMILES.
-Показано, что сочетание предобработки, OCR- и OCSR-моделей, а также постобработки повышает качество извлечения информации и позволяет использовать полученные данные для анализа, поиска и интеграции в интеллектуальные информационные системы. Результаты могут применяться при разработке программ цифровизации химической литературы и создании баз знаний на основе научных публикаций. }
+\ruAbstract{В статье рассматривается задача автоматизированной оцифровки химической литературы с использованием методов машинного зрения и анализа изображений. Актуальность работы обусловлена тем, что значительная часть накопленных химических знаний хранится в сканированных книгах, статьях и архивных документах, где наряду с текстом присутствуют структурные формулы, схемы реакций, таблицы и иные графические элементы; их автоматическая оцифровка требует специализированных методов обработки, поскольку стандартное распознавание текста не позволяет извлечь смысл графических химических объектов.
+Для решения этой проблемы предложен конвейер обработки химических документов, включающий адаптивную предобработку изображений, сегментацию страниц, выделение текстовых и графических областей, распознавание текста и химических структур, а также постобработку и преобразование результатов в машиночитаемый формат SMILES.
+Экспериментальная апробация проведена на изображениях страниц химических книг. Для распознавания текста лучшее качество (среднее значение метрики $1-\mathtt{WER}$ равное 0,7693) показала комбинированная схема, сочетающая адаптивную предобработку изображения с последующей языковой нормализацией текста, что в среднем повышает качество работы OCR примерно на 35\% по сравнению с базовой конфигурацией. Для распознавания химических структур сравнивались модели MolScribe, DECIMER и Qwen3VL: адаптивная предобработка изображения не дала универсального прироста качества --- лучший результат без предобработки показала MolScribe, тогда как после предобработки её качество снизилось, результат DECIMER не изменился, а Qwen3VL продемонстрировала лишь незначительное улучшение.
+Показано, что эффективность предобработки изображений зависит от конкретной модели и типа химической нотации, поэтому её применение требует индивидуальной настройки под задачу, а не может использоваться как универсальный этап обработки.
+ }
 
-\ruKeywords{оцифровка химической литературы, машинное зрение, анализ изображений страниц, OCR, OCSR, распознавание химических структур, сегментация страниц, предобработка изображений, нормализация текста, SMILES, химическая информатика, интеллектуальный поиск. }
+\ruKeywords{оцифровка химической литературы, машинное зрение, OCR, OCSR, распознавание химических структур, сегментация страниц, предобработка изображений, нормализация текста, SMILES.
+ }
 
 \enTitle{DIGITIZATION OF CHEMISTRY BOOKS USING MACHINE VISION}
 
@@ -108,11 +115,14 @@ columnsep=0.5cm
 	$^{2}$~Federal Research Center "Irkutsk Institute of Chemistry named after A.\,E.\ Favorsky, Siberian Branch of the Russian Academy of Sciences", ~Irkutsk\\ 
 }
 
-\enAbstract{This article examines the automated digitization of chemical literature using machine vision and image analysis. The relevance of this work lies in the fact that a significant portion of chemical information is contained in scanned books, articles, and archival documents, which include not only text but also structural formulas, reaction schemes, tables, and graphic elements, requiring specialized processing methods.
-A chemical document processing pipeline is proposed, including image preprocessing, page segmentation, text and graphic region extraction, text and chemical structure recognition, and conversion of the results to machine-readable SMILES format.
-It is demonstrated that a combination of preprocessing, OCR and OCSR models, and postprocessing improves the quality of information extraction and enables the use of the obtained data for analysis, search, and integration into intelligent information systems. The results can be applied in the development of programs for the digitalization of chemical literature and the creation of knowledge bases based on scientific publications. }
+\enAbstract{This article addresses the task of automated digitization of chemical literature using machine vision and image analysis methods. The relevance of the work is due to the fact that a large part of accumulated chemical knowledge is stored in scanned books, articles, and archival documents that contain not only text but also structural formulas, reaction schemes, tables, and other graphical elements; digitizing such material requires specialized processing methods, since standard text recognition alone cannot extract the meaning of graphical chemical objects.
+A chemical document processing pipeline is proposed, including adaptive image preprocessing, page segmentation, extraction of text and graphic regions, recognition of text and chemical structures, and postprocessing with conversion of the results into the machine-readable SMILES format.
+Experimental evaluation was performed on images of chemical book pages. For text recognition, the best quality (mean $1-\mathtt{WER}$ score of 0.7693) was achieved by a combined scheme applying adaptive image preprocessing followed by language-model-based text normalization, which improved average OCR quality by about 35\% over the baseline configuration. For chemical structure recognition, the MolScribe, DECIMER, and Qwen3VL models were compared: adaptive preprocessing did not yield a universal improvement --- the best result without preprocessing was obtained by MolScribe, whose quality dropped after preprocessing, DECIMER's result stayed the same, and Qwen3VL showed only a slight gain.
+The results show that the effectiveness of image preprocessing depends on the specific model and the type of chemical notation, so it should be tuned for each task rather than applied as a universal processing step.
+ }
 
-\enKeywords{chemical literature digitization, machine vision, page image analysis, OCR, OCSR, chemical structure recognition, page segmentation, image preprocessing, text normalization, SMILES, chemical informatics, intelligent search. } 
+\enKeywords{chemical literature digitization, machine vision, OCR, OCSR, chemical structure recognition, page segmentation, image preprocessing, text normalization, SMILES.
+ } 
 \begin{multicols}{2}	
 
 \section*{Введение}
@@ -134,8 +144,8 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 \begin{figure*}[hbtp]
 	\centering
 	\begin{tabular}{cc}
-		\includegraphics[width=0.45\linewidth]{img/classifications_ai.png} &
-		\includegraphics[width=0.45\linewidth]{img/classifications_cv.png} \\
+		\includegraphics[width=0.45\linewidth]{img/classifications_ai.jpg} &
+		\includegraphics[width=0.45\linewidth]{img/classifications_cv.jpg} \\
 		a$)$ & b$)$
 	\end{tabular}
 	\bicaption
@@ -154,7 +164,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 Машинное зрение (Computer Vision, CV) представляет собой область искусственного интеллекта, изучающую методы автоматического анализа изображений и видео с целью извлечения из них семантически значимой информации~\cite{refRakov}. В работе Рублевского~\cite{refRublevsky} машинное зрение выделяется как внешнее кольцо в общей классификации искусственного интеллекта (см. рис.~\ref{fig:classifications_ai}~a).
 Машинное зрение включает в себя задачи обработки документов, выделения структурных областей страницы и распознавания содержащейся на ней информации. Частным направлением компьютерного зрения является анализ изображений документов (Document Image Analysis или Document Understanding)(см.~рис.~\ref{fig:classifications_ai}~b), в рамках которого решаются задачи сегментации страницы, распознавания текста, таблиц, графики и иных содержательных элементов~\cite{refLayoutParser,refLayoutLM}.
 
-Одной из наиболее известных задач данного направления является OCR (optical character recognition, оптическое распознавание символов), ориентированная на извлечение текстовой информации из изображений документов~\cite{refSmith}. Однако, как было сказано, в химической литературе значимая часть информации представлена не только текстом, но и графическими структурами, поэтому наряду с OCR требуется использовать специализированные методы OCSR (optical chemical structure recognition, оптическое распознавание химической структур)~\cite{refWikiOCSR}, предназначенные для восстановления химических структур по их изображению. С методологической точки зрения OCSR не сводится к обычному OCR, поскольку предполагает восстановление молекулярного графа, а не только линейной последовательности символов. Таким образом, OCR и OCSR целесообразно рассматривать как родственные, но не вложенные подзадачи анализа изображений химических документов (см.~рис.~\ref{fig:classifications_ai}~b). 
+Одной из наиболее известных задач данного направления является OCR (optical character recognition, оптическое распознавание символов), ориентированная на извлечение текстовой информации из изображений документов~\cite{refOCRMetrics}. Однако, как было сказано, в химической литературе значимая часть информации представлена не только текстом, но и графическими структурами, поэтому наряду с OCR требуется использовать специализированные методы OCSR (optical chemical structure recognition, оптическое распознавание химической структур)~\cite{refWikiOCSR}, предназначенные для восстановления химических структур по их изображению. С методологической точки зрения OCSR не сводится к обычному OCR, поскольку предполагает восстановление молекулярного графа, а не только линейной последовательности символов. Таким образом, OCR и OCSR целесообразно рассматривать как родственные, но не вложенные подзадачи анализа изображений химических документов (см.~рис.~\ref{fig:classifications_ai}~b). 
 \section{Неоднородность изображений и их предобработка для улучшения качества работы системы}
 Большинство архивных химических книг и сканированных материалов характеризуются неоднородным качеством. В работе Akhil~\cite{refAkhil} выделялись следующие проблемы при обработке изображений:
 \begin{itemize}
@@ -167,11 +177,11 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 \begin{figure*}[hbtp]
 	\centering
 	\begin{tabular}{cc}
-		\includegraphics[width=0.25\linewidth]{img/blur.png} & 
-		\includegraphics[width=0.25\linewidth]{img/grain.png} \\
+		\includegraphics[width=0.25\linewidth]{img/blur.jpg} &
+		\includegraphics[width=0.25\linewidth]{img/grain.jpg} \\
 		a$)$ & b$)$\\
-		\includegraphics[width=0.25\linewidth]{img/flashing.png} & 
-		\includegraphics[width=0.25\linewidth]{img/orientation.png}\\
+		\includegraphics[width=0.25\linewidth]{img/flashing.jpg} &
+		\includegraphics[width=0.25\linewidth]{img/orientation.jpg}\\
 		c$)$ & d$)$		
 	\end{tabular}
 	\bicaption
@@ -198,8 +208,8 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 \begin{figure*}[hbtp]
 	\centering
 	\begin{tabular}{cc}
-		\includegraphics[width=0.25\linewidth]{img/detailed_form.png} & 
-		\includegraphics[width=0.25\linewidth]{img/skeletal_form.png} \\
+		\includegraphics[width=0.25\linewidth]{img/detailed_form.jpg} &
+		\includegraphics[width=0.25\linewidth]{img/skeletal_form.jpg} \\
 		a$)$ & b$)$	
 	\end{tabular}
 	\bicaption
@@ -220,7 +230,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 
 \begin{figure*}[hbtp]
 	\centering
-	\includegraphics[width=0.75\linewidth]{img/canon_smailes.png}
+	\includegraphics[width=0.75\linewidth]{img/canon_smailes.jpg}
 	\bicaption
 	{пример неоднозначного представление форму}
 	{example of ambiguous form representation}
@@ -240,7 +250,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=0.3\linewidth]{img/sheme.png}
+	\includegraphics[width=0.3\linewidth]{img/sheme.jpg}
 	\bicaption
 	{Схема сегментации}
 	{Segmentation scheme}
@@ -259,11 +269,11 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 	\item специализированных методов извлечения
 \end{enumerate} 
 \section{Программное обеспечения для обработки страниц химических книг}
-В рамках НИР "Роль библиотек в эпоху искусственного интеллекта" центральной научной библиотеки Иркутского Института химии им. Е.А. Фаворсокого~\cite{refTrofimov}, опиряясь на результаты анализа предметной области и выявленные ограничения существующих подходов, разрабатывается программное обеспечение для оцифровки страниц химических книг. Функциональная логика системы и основные этапы обработки данных представлены на UML-диаграмме активностей~\cite{refUML} (рис.~\ref{fig:bisnes}).
+В рамках НИР "Роль библиотек в эпоху искусственного интеллекта" центральной научной библиотеки Иркутского Института химии им. Е.А. Фаворсокого, опиряясь на результаты анализа предметной области и выявленные ограничения существующих подходов, разрабатывается программное обеспечение для оцифровки страниц химических книг. Функциональная логика системы и основные этапы обработки данных представлены на UML-диаграмме активностей~\cite{refUML} (рис.~\ref{fig:bisnes}).
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=0.55\linewidth]{img/chemistry_books_bisnes.png}
+	\includegraphics[width=0.55\linewidth]{img/chemistry_books_bisnes.jpg}
 	\bicaption
 	{UML-диаграмма активностей программы по обработке страниц книг по химии}
 	{UML activity diagram of a program for processing pages of chemistry books}
@@ -275,7 +285,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=1\linewidth]{img/example_prog.png}
+	\includegraphics[width=1\linewidth]{img/example_prog.jpg}
 	\bicaption
 	{Пример работы программы: \textit{1} -- исходная страница; \textit{2} -- результат работы сегментатора; \textit{3} -- предобработанный текст страницы; \textit{4} -- предобработанная формула; \textit{5} -- машино-обрабатываемый текст; \textit{6} -- формула в формате <<SMILES>>}
 	{Example of the program's operation: \textit{1} -- source page; \textit{2} -- segmenter's result; \textit{3} -- preprocessed page text; \textit{4} -- preprocessed formula; \textit{5} -- machine-processed text; \textit{6} -- formula in <<SMILES>> format}
@@ -327,7 +337,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 	Qwen3-VL представляет собой мультимодальную vision-language модель, способную анализировать графическую информацию и формировать текстовое описание содержимого изображения. В контексте задачи OCSR такая модель может рассматриваться как универсальный инструмент визуально-текстового преобразования, потенциально пригодный для интерпретации изображений химических структур. В отличие от специализированных моделей, таких как MolScribe и DECIMER, Qwen3-VL не разрабатывалась исключительно для задач химического распознавания, однако её мультимодальная архитектура позволяет использовать её в качестве сравнительного или вспомогательного подхода при анализе химических изображений~\cite{refQwen3VL}.
 \end{enumerate}
 
-Стоит уточнить, что для обеспечения суверенитета данных и автономности системы были использованны именно локальные модели~\cite{refTrofimov}.
+Стоит уточнить, что для обеспечения суверенитета данных и автономности системы были использованны именно локальные модели.
 
 Для применения локальных моделей MolScribe и DECIMER в работе использовались их встроенные механизмы обработки изображений химических структур. В случае Qwen3-VL он был также развёрнут локально, но взаимодействие с моделью осуществлялось программно через API с использованием системного промпта и набора демонстрационных примеров. Такой подход соответствует парадигме few-shot in-context learning, при которой модель адаптируется к требуемому формату ответа на основе контекста запроса без дополнительного дообучения параметров модели.
 
@@ -402,7 +412,11 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 	Ст. откл. & 0,2936 & 0,2975 & 0,2460 & 0,3053 & 0,2935 & 0,2983 \\
 	\hline
 \end{tabular} 	}
-	\caption{Результаты распознавания текста при различных конфигурациях OCR}
+	\bicaption{
+		Результаты распознавания текста при различных конфигурациях OCR
+		}{
+		Text recognition results with various OCR configurations	
+		}
 	\label{tab:ocr_compare}
 \end{table*}
 
@@ -430,7 +444,11 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 	Qwen3VL   & 3/10 & 3/10  & 6/20  & 4/10 & 3/10 & 7/20 \\
 	\hline
 \end{tabular} 	}
-	\caption{Результаты распознавания химических структур в подробной и скелетной нотациях без предобработки и с адаптивной предобработкой}
+	\bicaption{
+		Результаты распознавания химических структур в подробной и скелетной нотациях без предобработки и с адаптивной предобработкой
+		}{
+			Results of chemical structure recognition in detailed and skeletal notations without preprocessing and with adaptive preprocessing	
+		}
 	\label{tab:chem_models_compare}
 \end{table*}
 
@@ -454,9 +472,7 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 \end{center}
 \begin{thebibliography}{99}
 	\small
-	
-
-\bibitem{refDavletov}
+	\bibitem{refDavletov}
 Давлетов, А. Р. Современные методы машинного обучения и технология OCR для автоматизации обработки документов / А. Р. Давлетов. – Текст : электронный // Вестник науки. – 2023. – № 10 (67). – URL: https://cyberleninka.ru/article/n/sovremennye-metody-mashinnogo-obucheniya-i-tehnologiya-ocr-dlya-avtomatizatsii-obrabotki-dokumentov (дата обращения: 22.05.2026).
 
 \bibitem{refKuchuganov}
@@ -468,16 +484,26 @@ It is demonstrated that a combination of preprocessing, OCR and OCSR models, and
 \bibitem{refRublevsky}
 Рублевский, Р. Ландшафт основных терминов в области генеративного AI, их взаимосвязь и употребление / Р. Рублевский. – Текст : электронный // Хабр. – 2025. – 25 сент. – URL: https://habr.com/ru/articles/950600/ (дата обращения: 22.05.2026).
 
-\bibitem{refStarovoytov}
-Старовойтов, В. В. Получение и обработка изображений на ЭВМ : учебно-методическое пособие / В. В. Старовойтов, Ю. И. Голуб. – Минск : БНТУ, 2018. – 204 с. – ISBN 978-985-550-770-4. – Текст : непосредственный.
+\bibitem{refLayoutParser}
+Shen, Z. LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis / Z. Shen [et al.]. – Текст : электронный // arXiv.org. – 2021. – arXiv:2103.15348. – URL: https://arxiv.org/abs/2103.15348 (дата обращения: 22.05.2026).
 
-\bibitem{refTrofimov}
-Трофимов, И. Л. Роль библиотек в эпоху искусственного интеллекта: аналитический взгляд на новые ИИ-технологии и их применение / И. Л. Трофимов, Е. М. Кустова, С. М. Бараш, А. В. Буряк, В. Н. Филатова // Современные технологии. Системный анализ. Моделирование. – 2026. – № 3(87). – С. 94–104. – URL: https://ojs.irgups.ru/index.php/stsam/article/view/2450.
+\bibitem{refLayoutLM}
+Xu, Y. LayoutLM: Pre-training of Text and Layout for Document Image Understanding / Y. Xu, M. Li, L. Cui [et al.]. – Текст : электронный // arXiv.org. – 2019. – arXiv:1912.13318. – URL: https://arxiv.org/abs/1912.13318 (дата обращения: 22.05.2026).
 
+\bibitem{refOCRMetrics}
+Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (дата обращения: 22.05.2026).
 
+\bibitem{refWikiOCSR}
+Optical chemical structure recognition. – Текст : электронный // Wikipedia. – URL: https://en.wikipedia.org/wiki/Optical\_chemical\_structure\_recognition (дата обращения: 22.05.2026).
 
 \bibitem{refAkhil}
 Akhil, S. Overview of Tesseract OCR engine / S. Akhil. – Текст : электронный // ResearchGate. – 2016. – Dec. – URL: https://www.researchgate.net/publication/315834331 (дата обращения: 22.05.2026).
+
+\bibitem{refTrinajstic}
+Trinajstić, N. Chemical Graph Theory / N. Trinajstić. – 2nd ed. – Boca Raton : CRC Press, 1992. – 364 p. – Текст : непосредственный.
+
+\bibitem{refWarr}
+Warr, W. A. Representation of Chemical Structures / W. A. Warr // Wiley Interdisciplinary Reviews: Computational Molecular Science. – 2011. – Vol. 1, no. 4. – P. 557–579. – DOI: 10.1002/wcms.36.
 
 \bibitem{refLineAngle}
 Chapter 1 -- Organic Chemistry Review / Hydrocarbons. Section 1.4 Condensed Structural and Line-Angle Formulas. – Текст : электронный // Hostos Community College Library Guides. – URL: https://guides.hostos.cuny.edu/che120 (дата обращения: 22.05.2026).
@@ -485,62 +511,8 @@ Chapter 1 -- Organic Chemistry Review / Hydrocarbons. Section 1.4 Condensed Stru
 \bibitem{refDalby}
 Dalby, A. Description of Several Chemical Structure File Formats Used by Computer Programs Developed at Molecular Design Limited / A. Dalby, J. G. Nourse, W. D. Hounshell [et al.] // Journal of Chemical Information and Computer Sciences. – 1992. – Vol. 32, no. 3. – P. 244–255. – DOI: 10.1021/ci00007a012.
 
-\bibitem{refCAMP}
-Fifty, C. In-Context Learning for Few-Shot Molecular Property Prediction / C. Fifty, J. Leskovec, S. Thrun. – Текст : электронный // arXiv.org. – 2023. – arXiv:2310.08863. – URL: https://arxiv.org/abs/2310.08863 (дата обращения: 22.05.2026).
-
-\bibitem{refGoF}
-Gamma, E. Design Patterns: Elements of Reusable Object-Oriented Software / E. Gamma, R. Helm, R. Johnson, J. Vlissides. – Reading : Addison-Wesley, 1995. – 395 p. – ISBN 0-201-63361-2. – Текст : непосредственный.
-
-\bibitem{refXYCut}
-Ha, J. Recursive X-Y Cut Using Bounding Boxes of Connected Components / J. Ha, R. M. Haralick, I. T. Phillips // Proceedings of the Third International Conference on Document Analysis and Recognition. – 1995. – Vol. 2. – P. 952–955. – DOI: 10.1109/ICDAR.1995.602058.
-
 \bibitem{refInChI}
 Heller, S. R. InChI, the IUPAC International Chemical Identifier / S. R. Heller, A. McNaught, I. Pletnev [et al.] // Journal of Cheminformatics. – 2015. – Vol. 7. – Art. 23. – DOI: 10.1186/s13321-015-0068-4.
-
-\bibitem{refLlava}
-Liu, H. Visual Instruction Tuning / H. Liu, C. Li, Q. Wu, Y. J. Lee. – Текст : электронный // arXiv.org. – 2023. – arXiv:2305.11845. – URL: https://arxiv.org/abs/2305.11845 (дата обращения: 22.05.2026).
-
-\bibitem{refOBoyleCanonical}
-O'Boyle, N. M. Towards a Universal SMILES Representation – A Standard Method to Generate Canonical SMILES Based on the InChI / N. M. O'Boyle // Journal of Cheminformatics. – 2012. – Vol. 4. – Art. 22. – DOI: 10.1186/1758-2946-4-22.
-
-\bibitem{refUML}
-OMG Unified Modeling Language (OMG UML), Version 2.5.1 / Object Management Group. – Текст : электронный. – 2017. – URL: https://www.omg.org/spec/UML/2.5.1/PDF (дата обращения: 22.05.2026).
-
-\bibitem{refWikiOCSR}
-Optical chemical structure recognition. – Текст : электронный // Wikipedia. – URL: https://en.wikipedia.org/wiki/Optical\_chemical\_structure\_recognition (дата обращения: 22.05.2026).
-
-\bibitem{refMolScribe}
-Qian, Y. MolScribe: Robust Molecular Structure Recognition with Image-To-Graph Generation / Y. Qian, J. Guo, Z. Tu [et al.]. – Текст : электронный // arXiv.org. – 2022. – arXiv:2205.14311. – URL: https://arxiv.org/pdf/2205.14311 (дата обращения: 22.05.2026).
-
-\bibitem{refQwen3VL}
-Qwen Team. Qwen3-VL Technical Report / Qwen Team. – Текст : электронный // arXiv.org. – 2025. – arXiv:2511.21631. – URL: https://arxiv.org/abs/2511.21631 (дата обращения: 22.05.2026).
-
-\bibitem{refDECIMER}
-Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan [et al.]. – Текст : электронный // ResearchGate. – 2021. – Aug. (дата обращения: 22.05.2026).
-
-\bibitem{refDECIMERJournal}
-Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan, A. Zielesny, C. Steinbeck. – Текст : электронный // Journal of Cheminformatics. – 2021. – Vol. 13. – DOI: 10.1186/s13321-021-00538-8. – URL: https://doi.org/10.1186/s13321-021-00538-8 (дата обращения: 22.05.2026).
-
-\bibitem{refLayoutParser}
-Shen, Z. LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis / Z. Shen [et al.]. – Текст : электронный // arXiv.org. – 2021. – arXiv:2103.15348. – URL: https://arxiv.org/abs/2103.15348 (дата обращения: 22.05.2026).
-
-\bibitem{refOCRMetrics}
-Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (дата обращения: 22.05.2026).
-
-\bibitem{refSmith}
-Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (дата обращения: 22.05.2026).
-
-\bibitem{refTrinajstic}
-Trinajstić, N. Chemical Graph Theory / N. Trinajstić. – 2nd ed. – Boca Raton : CRC Press, 1992. – 364 p. – Текст : непосредственный.
-
-\bibitem{refPEP8}
-van Rossum, G. PEP 8 -- Style Guide for Python Code / G. van Rossum, B. Warsaw, A. Coghlan. – Текст : электронный // Python.org. – URL: https://peps.python.org/pep-0008/ (дата обращения: 23.05.2026).
-
-\bibitem{refMinerU}
-Wang, B. MinerU: An Open-Source Solution for Precise Document Content Extraction / B. Wang, C. Xu, X. Zhao, L. Ouyang, F. Wu, Z. Zhao, R. Xu, K. Liu, Y. Qu, F. Shang [et al.] // arXiv preprint. – 2024. – arXiv:2409.18839. – DOI: 10.48550/arXiv.2409.18839.
-
-\bibitem{refWarr}
-Warr, W. A. Representation of Chemical Structures / W. A. Warr // Wiley Interdisciplinary Reviews: Computational Molecular Science. – 2011. – Vol. 1, no. 4. – P. 557–579. – DOI: 10.1002/wcms.36.
 
 \bibitem{refWeininger1}
 Weininger, D. SMILES, a Chemical Language and Information System. 1. Introduction to Methodology and Encoding Rules / D. Weininger // Journal of Chemical Information and Computer Sciences. – 1988. – Vol. 28, no. 1. – P. 31–36. – DOI: 10.1021/ci00057a005.
@@ -548,11 +520,47 @@ Weininger, D. SMILES, a Chemical Language and Information System. 1. Introductio
 \bibitem{refWeininger2}
 Weininger, D. SMILES. 2. Algorithm for Generation of Unique SMILES Notation / D. Weininger, A. Weininger, J. L. Weininger // Journal of Chemical Information and Computer Sciences. – 1989. – Vol. 29, no. 2. – P. 97–101. – DOI: 10.1021/ci00062a008.
 
+\bibitem{refOBoyleCanonical}
+O'Boyle, N. M. Towards a Universal SMILES Representation – A Standard Method to Generate Canonical SMILES Based on the InChI / N. M. O'Boyle // Journal of Cheminformatics. – 2012. – Vol. 4. – Art. 22. – DOI: 10.1186/1758-2946-4-22.
+
+\bibitem{refMinerU}
+Wang, B. MinerU: An Open-Source Solution for Precise Document Content Extraction / B. Wang, C. Xu, X. Zhao, L. Ouyang, F. Wu, Z. Zhao, R. Xu, K. Liu, Y. Qu, F. Shang [et al.] // arXiv preprint. – 2024. – arXiv:2409.18839. – DOI: 10.48550/arXiv.2409.18839.
+
+\bibitem{refXYCut}
+Ha, J. Recursive X-Y Cut Using Bounding Boxes of Connected Components / J. Ha, R. M. Haralick, I. T. Phillips // Proceedings of the Third International Conference on Document Analysis and Recognition. – 1995. – Vol. 2. – P. 952–955. – DOI: 10.1109/ICDAR.1995.602058.
+
 \bibitem{refRLSA}
 Wong, K. Y. Document Analysis System / K. Y. Wong, R. G. Casey, F. M. Wahl // IBM Journal of Research and Development. – 1982. – Vol. 26, no. 6. – P. 647–656. – DOI: 10.1147/rd.266.0647.
 
-\bibitem{refLayoutLM}
-Xu, Y. LayoutLM: Pre-training of Text and Layout for Document Image Understanding / Y. Xu, M. Li, L. Cui [et al.]. – Текст : электронный // arXiv.org. – 2019. – arXiv:1912.13318. – URL: https://arxiv.org/abs/1912.13318 (дата обращения: 22.05.2026).
+\bibitem{refUML}
+OMG Unified Modeling Language (OMG UML), Version 2.5.1 / Object Management Group. – Текст : электронный. – 2017. – URL: https://www.omg.org/spec/UML/2.5.1/PDF (дата обращения: 22.05.2026).
+
+\bibitem{refGoF}
+Gamma, E. Design Patterns: Elements of Reusable Object-Oriented Software / E. Gamma, R. Helm, R. Johnson, J. Vlissides. – Reading : Addison-Wesley, 1995. – 395 p. – ISBN 0-201-63361-2. – Текст : непосредственный.
+
+\bibitem{refPEP8}
+van Rossum, G. PEP 8 -- Style Guide for Python Code / G. van Rossum, B. Warsaw, A. Coghlan. – Текст : электронный // Python.org. – URL: https://peps.python.org/pep-0008/ (дата обращения: 23.05.2026).
+
+\bibitem{refStarovoytov}
+Старовойтов, В. В. Получение и обработка изображений на ЭВМ : учебно-методическое пособие / В. В. Старовойтов, Ю. И. Голуб. – Минск : БНТУ, 2018. – 204 с. – ISBN 978-985-550-770-4. – Текст : непосредственный.
+
+\bibitem{refLlava}
+Liu, H. Visual Instruction Tuning / H. Liu, C. Li, Q. Wu, Y. J. Lee. – Текст : электронный // arXiv.org. – 2023. – arXiv:2305.11845. – URL: https://arxiv.org/abs/2305.11845 (дата обращения: 22.05.2026).
+
+\bibitem{refMolScribe}
+Qian, Y. MolScribe: Robust Molecular Structure Recognition with Image-To-Graph Generation / Y. Qian, J. Guo, Z. Tu [et al.]. – Текст : электронный // arXiv.org. – 2022. – arXiv:2205.14311. – URL: https://arxiv.org/pdf/2205.14311 (дата обращения: 22.05.2026).
+
+\bibitem{refDECIMER}
+Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan [et al.]. – Текст : электронный // ResearchGate. – 2021. – Aug. (дата обращения: 22.05.2026).
+
+\bibitem{refDECIMERJournal}
+Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan, A. Zielesny, C. Steinbeck. – Текст : электронный // Journal of Cheminformatics. – 2021. – Vol. 13. – DOI: 10.1186/s13321-021-00538-8. – URL: https://doi.org/10.1186/s13321-021-00538-8 (дата обращения: 22.05.2026).
+
+\bibitem{refQwen3VL}
+Qwen Team. Qwen3-VL Technical Report / Qwen Team. – Текст : электронный // arXiv.org. – 2025. – arXiv:2511.21631. – URL: https://arxiv.org/abs/2511.21631 (дата обращения: 22.05.2026).
+
+\bibitem{refCAMP}
+Fifty, C. In-Context Learning for Few-Shot Molecular Property Prediction / C. Fifty, J. Leskovec, S. Thrun. – Текст : электронный // arXiv.org. – 2023. – arXiv:2310.08863. – URL: https://arxiv.org/abs/2310.08863 (дата обращения: 22.05.2026).
  \end{thebibliography}
 
 \begin{center}
@@ -572,14 +580,26 @@ Rakov, N. S. Machine vision / N. S. Rakov, S. V. Palmov. – Text : electronic /
 \bibitem{refRublevskyEn}
 Rublevsky, R. The landscape of key terms in generative AI, their relationship and use / R. Rublevsky. – Text : electronic // Habr. – 2025. – 25 Sept. – URL: https://habr.com/ru/articles/950600/ (accessed: 22.05.2026).
 
-\bibitem{refStarovoytovEn}
-Starovoytov, V. V. Image acquisition and processing on computers : educational and methodological manual / V. V. Starovoytov, Yu. I. Golub. – Minsk : BNTU, 2018. – 204 p. – ISBN 978-985-550-770-4. – Text : direct.
+\bibitem{refLayoutParserEn}
+Shen, Z. LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis / Z. Shen [et al.]. – Text : electronic // arXiv.org. – 2021. – arXiv:2103.15348. – URL: https://arxiv.org/abs/2103.15348 (accessed: 22.05.2026).
 
-\bibitem{refTrofimovEn}
-Trofimov, I. L. The Role of Libraries in the Era of Artificial Intelligence: An Analytical Perspective on New AI Technologies and Their Applications / I. L. Trofimov, E. M. Kustova, S. M. Barash, A. V. Buryak, V. N. Filatova // Modern Technologies. System Analysis. Modeling. – 2026. – No. 3(87). – P. 94–104. – URL: https://ojs.irgups.ru/index.php/stsam/article/view/2450.
+\bibitem{refLayoutLMEn}
+Xu, Y. LayoutLM: Pre-training of Text and Layout for Document Image Understanding / Y. Xu, M. Li, L. Cui [et al.]. – Text : electronic // arXiv.org. – 2019. – arXiv:1912.13318. – URL: https://arxiv.org/abs/1912.13318 (accessed: 22.05.2026).
+
+\bibitem{refOCRMetricsEn}
+Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (accessed: 22.05.2026).
+
+\bibitem{refWikiOCSREn}
+Optical chemical structure recognition. – Text : electronic // Wikipedia. – URL: https://en.wikipedia.org/wiki/Optical\_chemical\_structure\_recognition (accessed: 22.05.2026).
 
 \bibitem{refAkhilEn}
 Akhil, S. Overview of Tesseract OCR engine / S. Akhil. – Text : electronic // ResearchGate. – 2016. – Dec. – URL: https://www.researchgate.net/publication/315834331 (accessed: 22.05.2026).
+
+\bibitem{refTrinajsticEn}
+Trinajstić, N. Chemical Graph Theory / N. Trinajstić. – 2nd ed. – Boca Raton : CRC Press, 1992. – 364 p. – Text : direct.
+
+\bibitem{refWarrEn}
+Warr, W. A. Representation of Chemical Structures / W. A. Warr // Wiley Interdisciplinary Reviews: Computational Molecular Science. – 2011. – Vol. 1, no. 4. – P. 557–579. – DOI: 10.1002/wcms.36.
 
 \bibitem{refLineAngleEn}
 Chapter 1 -- Organic Chemistry Review / Hydrocarbons. Section 1.4 Condensed Structural and Line-Angle Formulas. – Text : electronic // Hostos Community College Library Guides. – URL: https://guides.hostos.cuny.edu/che120 (accessed: 22.05.2026).
@@ -587,62 +607,8 @@ Chapter 1 -- Organic Chemistry Review / Hydrocarbons. Section 1.4 Condensed Stru
 \bibitem{refDalbyEn}
 Dalby, A. Description of Several Chemical Structure File Formats Used by Computer Programs Developed at Molecular Design Limited / A. Dalby, J. G. Nourse, W. D. Hounshell [et al.] // Journal of Chemical Information and Computer Sciences. – 1992. – Vol. 32, no. 3. – P. 244–255. – DOI: 10.1021/ci00007a012.
 
-\bibitem{refCAMPEn}
-Fifty, C. In-Context Learning for Few-Shot Molecular Property Prediction / C. Fifty, J. Leskovec, S. Thrun. – Text : electronic // arXiv.org. – 2023. – arXiv:2310.08863. – URL: https://arxiv.org/abs/2310.08863 (accessed: 22.05.2026).
-
-\bibitem{refGoFEn}
-Gamma, E. Design Patterns: Elements of Reusable Object-Oriented Software / E. Gamma, R. Helm, R. Johnson, J. Vlissides. – Reading : Addison-Wesley, 1995. – 395 p. – ISBN 0-201-63361-2. – Text : direct.
-
-\bibitem{refXYCutEn}
-Ha, J. Recursive X-Y Cut Using Bounding Boxes of Connected Components / J. Ha, R. M. Haralick, I. T. Phillips // Proceedings of the Third International Conference on Document Analysis and Recognition. – 1995. – Vol. 2. – P. 952–955. – DOI: 10.1109/ICDAR.1995.602058.
-
 \bibitem{refInChIEn}
 Heller, S. R. InChI, the IUPAC International Chemical Identifier / S. R. Heller, A. McNaught, I. Pletnev [et al.] // Journal of Cheminformatics. – 2015. – Vol. 7. – Art. 23. – DOI: 10.1186/s13321-015-0068-4.
-
-\bibitem{refLlavaEn}
-Liu, H. Visual Instruction Tuning / H. Liu, C. Li, Q. Wu, Y. J. Lee. – Text : electronic // arXiv.org. – 2023. – arXiv:2305.11845. – URL: https://arxiv.org/abs/2305.11845 (accessed: 22.05.2026).
-
-\bibitem{refOBoyleCanonicalEn}
-O'Boyle, N. M. Towards a Universal SMILES Representation – A Standard Method to Generate Canonical SMILES Based on the InChI / N. M. O'Boyle // Journal of Cheminformatics. – 2012. – Vol. 4. – Art. 22. – DOI: 10.1186/1758-2946-4-22.
-
-\bibitem{refUMLEn}
-OMG Unified Modeling Language (OMG UML), Version 2.5.1 / Object Management Group. – Text : electronic. – 2017. – URL: https://www.omg.org/spec/UML/2.5.1/PDF (accessed: 22.05.2026).
-
-\bibitem{refWikiOCSREn}
-Optical chemical structure recognition. – Text : electronic // Wikipedia. – URL: https://en.wikipedia.org/wiki/Optical\_chemical\_structure\_recognition (accessed: 22.05.2026).
-
-\bibitem{refMolScribeEn}
-Qian, Y. MolScribe: Robust Molecular Structure Recognition with Image-To-Graph Generation / Y. Qian, J. Guo, Z. Tu [et al.]. – Text : electronic // arXiv.org. – 2022. – arXiv:2205.14311. – URL: https://arxiv.org/pdf/2205.14311 (accessed: 22.05.2026).
-
-\bibitem{refQwen3VLEn}
-Qwen Team. Qwen3-VL Technical Report / Qwen Team. – Text : electronic // arXiv.org. – 2025. – arXiv:2511.21631. – URL: https://arxiv.org/abs/2511.21631 (accessed: 22.05.2026).
-
-\bibitem{refDECIMEREn}
-Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan [et al.]. – Text : electronic // ResearchGate. – 2021. – Aug. (accessed: 22.05.2026).
-
-\bibitem{refDECIMERJournalEn}
-Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan, A. Zielesny, C. Steinbeck. – Text : electronic // Journal of Cheminformatics. – 2021. – Vol. 13. – DOI: 10.1186/s13321-021-00538-8. – URL: https://doi.org/10.1186/s13321-021-00538-8 (accessed: 22.05.2026).
-
-\bibitem{refLayoutParserEn}
-Shen, Z. LayoutParser: A Unified Toolkit for Deep Learning Based Document Image Analysis / Z. Shen [et al.]. – Text : electronic // arXiv.org. – 2021. – arXiv:2103.15348. – URL: https://arxiv.org/abs/2103.15348 (accessed: 22.05.2026).
-
-\bibitem{refOCRMetricsEn}
-Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (accessed: 22.05.2026).
-
-\bibitem{refSmithEn}
-Smith, R. An Overview of the Tesseract OCR Engine / R. Smith // Ninth International Conference on Document Analysis and Recognition (ICDAR 2007). – Washington : IEEE Computer Society, 2007. – Vol. 2. – P. 629–633. – DOI: 10.1109/ICDAR.2007.4376991. – URL: https://doi.org/10.1109/ICDAR.2007.4376991 (accessed: 22.05.2026).
-
-\bibitem{refTrinajsticEn}
-Trinajstić, N. Chemical Graph Theory / N. Trinajstić. – 2nd ed. – Boca Raton : CRC Press, 1992. – 364 p. – Text : direct.
-
-\bibitem{refPEP8En}
-van Rossum, G. PEP 8 -- Style Guide for Python Code / G. van Rossum, B. Warsaw, A. Coghlan. – Text : electronic // Python.org. – URL: https://peps.python.org/pep-0008/ (accessed: 23.05.2026).
-
-\bibitem{refMinerUEn}
-Wang, B. MinerU: An Open-Source Solution for Precise Document Content Extraction / B. Wang, C. Xu, X. Zhao, L. Ouyang, F. Wu, Z. Zhao, R. Xu, K. Liu, Y. Qu, F. Shang [et al.] // arXiv preprint. – 2024. – arXiv:2409.18839. – DOI: 10.48550/arXiv.2409.18839.
-
-\bibitem{refWarrEn}
-Warr, W. A. Representation of Chemical Structures / W. A. Warr // Wiley Interdisciplinary Reviews: Computational Molecular Science. – 2011. – Vol. 1, no. 4. – P. 557–579. – DOI: 10.1002/wcms.36.
 
 \bibitem{refWeininger1En}
 Weininger, D. SMILES, a Chemical Language and Information System. 1. Introduction to Methodology and Encoding Rules / D. Weininger // Journal of Chemical Information and Computer Sciences. – 1988. – Vol. 28, no. 1. – P. 31–36. – DOI: 10.1021/ci00057a005.
@@ -650,11 +616,47 @@ Weininger, D. SMILES, a Chemical Language and Information System. 1. Introductio
 \bibitem{refWeininger2En}
 Weininger, D. SMILES. 2. Algorithm for Generation of Unique SMILES Notation / D. Weininger, A. Weininger, J. L. Weininger // Journal of Chemical Information and Computer Sciences. – 1989. – Vol. 29, no. 2. – P. 97–101. – DOI: 10.1021/ci00062a008.
 
+\bibitem{refOBoyleCanonicalEn}
+O'Boyle, N. M. Towards a Universal SMILES Representation – A Standard Method to Generate Canonical SMILES Based on the InChI / N. M. O'Boyle // Journal of Cheminformatics. – 2012. – Vol. 4. – Art. 22. – DOI: 10.1186/1758-2946-4-22.
+
+\bibitem{refMinerUEn}
+Wang, B. MinerU: An Open-Source Solution for Precise Document Content Extraction / B. Wang, C. Xu, X. Zhao, L. Ouyang, F. Wu, Z. Zhao, R. Xu, K. Liu, Y. Qu, F. Shang [et al.] // arXiv preprint. – 2024. – arXiv:2409.18839. – DOI: 10.48550/arXiv.2409.18839.
+
+\bibitem{refXYCutEn}
+Ha, J. Recursive X-Y Cut Using Bounding Boxes of Connected Components / J. Ha, R. M. Haralick, I. T. Phillips // Proceedings of the Third International Conference on Document Analysis and Recognition. – 1995. – Vol. 2. – P. 952–955. – DOI: 10.1109/ICDAR.1995.602058.
+
 \bibitem{refRLSAEn}
 Wong, K. Y. Document Analysis System / K. Y. Wong, R. G. Casey, F. M. Wahl // IBM Journal of Research and Development. – 1982. – Vol. 26, no. 6. – P. 647–656. – DOI: 10.1147/rd.266.0647.
 
-\bibitem{refLayoutLMEn}
-Xu, Y. LayoutLM: Pre-training of Text and Layout for Document Image Understanding / Y. Xu, M. Li, L. Cui [et al.]. – Text : electronic // arXiv.org. – 2019. – arXiv:1912.13318. – URL: https://arxiv.org/abs/1912.13318 (accessed: 22.05.2026).
+\bibitem{refUMLEn}
+OMG Unified Modeling Language (OMG UML), Version 2.5.1 / Object Management Group. – Text : electronic. – 2017. – URL: https://www.omg.org/spec/UML/2.5.1/PDF (accessed: 22.05.2026).
+
+\bibitem{refGoFEn}
+Gamma, E. Design Patterns: Elements of Reusable Object-Oriented Software / E. Gamma, R. Helm, R. Johnson, J. Vlissides. – Reading : Addison-Wesley, 1995. – 395 p. – ISBN 0-201-63361-2. – Text : direct.
+
+\bibitem{refPEP8En}
+van Rossum, G. PEP 8 -- Style Guide for Python Code / G. van Rossum, B. Warsaw, A. Coghlan. – Text : electronic // Python.org. – URL: https://peps.python.org/pep-0008/ (accessed: 23.05.2026).
+
+\bibitem{refStarovoytovEn}
+Starovoytov, V. V. Image acquisition and processing on computers : educational and methodological manual / V. V. Starovoytov, Yu. I. Golub. – Minsk : BNTU, 2018. – 204 p. – ISBN 978-985-550-770-4. – Text : direct.
+
+\bibitem{refLlavaEn}
+Liu, H. Visual Instruction Tuning / H. Liu, C. Li, Q. Wu, Y. J. Lee. – Text : electronic // arXiv.org. – 2023. – arXiv:2305.11845. – URL: https://arxiv.org/abs/2305.11845 (accessed: 22.05.2026).
+
+\bibitem{refMolScribeEn}
+Qian, Y. MolScribe: Robust Molecular Structure Recognition with Image-To-Graph Generation / Y. Qian, J. Guo, Z. Tu [et al.]. – Text : electronic // arXiv.org. – 2022. – arXiv:2205.14311. – URL: https://arxiv.org/pdf/2205.14311 (accessed: 22.05.2026).
+
+\bibitem{refDECIMEREn}
+Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan [et al.]. – Text : electronic // ResearchGate. – 2021. – Aug. (accessed: 22.05.2026).
+
+\bibitem{refDECIMERJournalEn}
+Rajan, K. DECIMER 1.0: deep learning for chemical image recognition using transformers / K. Rajan, A. Zielesny, C. Steinbeck. – Text : electronic // Journal of Cheminformatics. – 2021. – Vol. 13. – DOI: 10.1186/s13321-021-00538-8. – URL: https://doi.org/10.1186/s13321-021-00538-8 (accessed: 22.05.2026).
+
+\bibitem{refQwen3VLEn}
+Qwen Team. Qwen3-VL Technical Report / Qwen Team. – Text : electronic // arXiv.org. – 2025. – arXiv:2511.21631. – URL: https://arxiv.org/abs/2511.21631 (accessed: 22.05.2026).
+
+\bibitem{refCAMPEn}
+Fifty, C. In-Context Learning for Few-Shot Molecular Property Prediction / C. Fifty, J. Leskovec, S. Thrun. – Text : electronic // arXiv.org. – 2023. – arXiv:2310.08863. – URL: https://arxiv.org/abs/2310.08863 (accessed: 22.05.2026).
  \end{thebibliography}
 
 	
